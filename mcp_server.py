@@ -254,7 +254,7 @@ def send_to_model(prompt: str, system_prompt: str = None) -> str:
         payload["system"] = system_prompt
 
     try:
-        response = requests.post(url, json=payload, timeout=30)
+        response = requests.post(url, json=payload, timeout=120)
         response.raise_for_status()
         result = response.json()
         return result.get("response", "No response received from model")
