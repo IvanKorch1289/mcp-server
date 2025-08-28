@@ -134,7 +134,7 @@ async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[TextCon
         }, ensure_ascii=False))]
 
 # Функции инструментов
-def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
+async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
     """Count files in a directory"""
     try:
         if not os.path.exists(directory_path):
@@ -173,7 +173,7 @@ def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
     except Exception as e:
         return {"error": f"Unexpected error: {str(e)}"}
 
-def get_current_time() -> Dict[str, Any]:
+async def get_current_time() -> Dict[str, Any]:
     """Get current date and time"""
     now = datetime.now()
     return {
@@ -183,7 +183,7 @@ def get_current_time() -> Dict[str, Any]:
         "timezone": str(now.astimezone().tzinfo)
     }
 
-def read_file_content(file_path: str) -> Dict[str, Any]:
+async def read_file_content(file_path: str) -> Dict[str, Any]:
     """Read content of a file"""
     try:
         if not os.path.exists(file_path):
@@ -209,7 +209,7 @@ def read_file_content(file_path: str) -> Dict[str, Any]:
     except Exception as e:
         return {"error": f"Error reading file: {str(e)}"}
 
-def create_note(content: str, filename: str = None) -> Dict[str, Any]:
+async def create_note(content: str, filename: str = None) -> Dict[str, Any]:
     """Create a text note with the given content"""
     try:
         if not filename:
@@ -235,7 +235,7 @@ def create_note(content: str, filename: str = None) -> Dict[str, Any]:
         return {"error": f"Error creating note: {str(e)}"}
 
 # Функция для отправки промпта модели
-def send_to_model(prompt: str, system_prompt: str = None) -> str:
+async def send_to_model(prompt: str, system_prompt: str = None) -> str:
     """Send prompt to Qwen model"""
     url = f"{OLLAMA_URL}/api/generate"
 
@@ -257,7 +257,7 @@ def send_to_model(prompt: str, system_prompt: str = None) -> str:
         response = requests.post(url, json=payload, timeout=120)
         response.raise_for_status()
         result = response.json()
-        return result.get("response", "No response received from model")
+        return await result.get("response", "No response received from model")
     except requests.exceptions.Timeout:
         return "Model request timed out"
     except requests.exceptions.RequestException as e:
