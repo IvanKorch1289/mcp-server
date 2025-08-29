@@ -1,3 +1,5 @@
 /ollama_data
 /.venv
 /.vscode
+.env
+/notes
