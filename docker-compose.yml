@@ -1,15 +1,33 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama_qwen
+  tarantool:
+    image: tarantool/tarantool:2.11
+    container_name: tarantool-cache
     ports:
-      - '11434:11434'
-    volumes:
-      - ./ollama_data:/root/.ollama
-      - /tmp:/tmp
+      - "3302:3301"
     environment:
-      - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_ORIGINS=*
+      - TARANTOOL_INIT_SCRIPT=/opt/tarantool/init.lua  # ← Указываем путь
+    volumes:
+      - ./tarantool/init.lua:/opt/tarantool/init.lua:ro  # ← Монтируем в /opt
+      - tarantool_data:/var/lib/tarantool
+    command: ["tarantool", "/opt/tarantool/init.lua"]  # ← Явный запуск
     restart: unless-stopped
+
+volumes:
+  tarantool_data:
+
+
+# services:
+#   ollama:
+#     image: ollama/ollama:latest
+#     container_name: ollama_qwen
+#     ports:
+#       - '11434:11434'
+#     volumes:
+#       - ./ollama_data:/root/.ollama
+#       - /tmp:/tmp
+#     environment:
+#       - OLLAMA_HOST=0.0.0.0
+#       - OLLAMA_ORIGINS=*
+#     restart: unless-stopped
   
 # sudo docker exec -it ollama_qwen ollama pull qwen2.5:7b
