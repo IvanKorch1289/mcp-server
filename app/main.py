@@ -1,23 +1,25 @@
-from datetime import datetime
-import uvicorn
-from fastapi import FastAPI, BackgroundTasks, HTTPException
-from contextlib import asynccontextmanager
-from typing import AsyncIterator
-
-from app.server import app_graph, run_mcp_server
-from app.session import session_manager, update_session_history
-from app.models import PromptRequest
-from app.storage.tarantool import tarantool_service
+import asyncio
 import logging
 import os
-import asyncio
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import AsyncIterator
 
+import uvicorn
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+
+from app.fetch_data import fetch_company_info, fetch_from_infosphere
+from app.models import PromptRequest
+from app.server import app_graph, run_mcp_server
+from app.session import session_manager, update_session_history
+from app.storage.tarantool import tarantool_service
 
 logger = logging.getLogger(__name__)
 
 # =======================
 # Lifespan: управление жизненным циклом
 # =======================
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -96,10 +98,7 @@ async def process_prompt(request: PromptRequest, bg: BackgroundTasks):
         # Добавляем сообщение об ошибке в историю сессии
         update_session_history(session, "assistant", error_msg)
 
-        raise HTTPException(
-            status_code=500,
-            detail=error_msg
-        )
+        raise HTTPException(status_code=500, detail=error_msg) from e
 
 
 @app.get("/sessions/{session_id}")
@@ -119,8 +118,20 @@ async def get_session_history(session_id: str):
         "created_at": session.created_at,
         "last_accessed": session.last_accessed,
         "history": session.history,
-        "total_messages": len(session.history)
+        "total_messages": len(session.history),
     }
+
+
+@app.get("/client/infosphere/{inn}")
+async def get_infosphere_data(inn: str):
+    """Получить данные по клиенту из Инфосферы (для отладки)."""
+    return await fetch_from_infosphere(inn)
+
+
+@app.get("/client/info/{inn}")
+async def get_all_client_data(inn: str):
+    """Получить данные по клиенту (для отладки)."""
+    return await fetch_company_info(inn)
 
 
 # Основная функция запуска
@@ -134,19 +145,12 @@ async def main():
 
     # Запускаем FastAPI сервер
     config = uvicorn.Config(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info",
-        reload=True
+        app, host="0.0.0.0", port=8000, log_level="info", reload=True
     )
     server = uvicorn.Server(config)
 
     # Запускаем оба сервера
-    await asyncio.gather(
-        server.serve(),
-        mcp_task
-    )
+    await asyncio.gather(server.serve(), mcp_task)
 
 
 if __name__ == "__main__":

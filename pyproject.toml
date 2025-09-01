@@ -20,7 +20,6 @@ mcp = ">=1.13.1,<2.0.0"
 ollama = ">=0.5.3,<0.6.0"
 fastapi = ">=0.116.1,<0.117.0"
 aiohttp = ">=3.12.15,<4.0.0"
-isort = ">=6.0.1,<7.0.0"
 langchain-community = ">=0.3.29,<0.4.0"
 aiofiles = ">=24.1.0,<25.0.0"
 python-dotenv = "^1.1.1"
@@ -30,7 +29,56 @@ httpx = "^0.28.1"
 xmltodict = "^0.14.2"
 tarantool = "^1.2.0"
 fastmcp = "^2.12.0"
+uvicorn = "^0.35.0"
+vulture = "^2.14"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.11"
+pyright = "^1.1.404"
+detect-secrets = "^1.5.0"
+pylint = "^3.3.8"
+pip-audit = "^2.9.0"
+bandit = "^1.8.6"
+deptry = "^0.23.1"
+black = "^25.1.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.vulture]
+ignore_names = [
+    "x_api_key"
+]
+min_confidence = 70
+exclude = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/venv/*"
+]
+
+[tool.pyright]
+include = ["app"]
+exclude = ["**/__pycache__"]
+typeCheckingMode = "basic"
+pythonVersion = "3.12"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "F",   # pyflakes
+  "E",   # pycodestyle
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+]
+ignore = ["E501"]
+per-file-ignores = { "__init__.py" = ["F401"] }
+
+[tool.ruff.format]
+line-ending = "auto"
+indent-style = "space"
+quote-style = "double"

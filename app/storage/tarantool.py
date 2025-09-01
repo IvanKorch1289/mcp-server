@@ -1,11 +1,12 @@
-import tarantool
-import msgpack
-import time
-from typing import Optional, Dict, Any
-from concurrent.futures import ThreadPoolExecutor
 import asyncio
-from app.settings import settings
+import time
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, Optional
 
+import msgpack
+
+import tarantool
+from app.settings import settings
 
 executor = ThreadPoolExecutor(max_workers=2)
 
@@ -24,7 +25,7 @@ class TarantoolService:
             )
             return "OK"
         except Exception as e:
-            raise ConnectionError(f"Failed to connect to Tarantool: {e}")
+            raise ConnectionError(f"Failed to connect to Tarantool: {e}") from e
 
     async def connect(self):
         loop = asyncio.get_event_loop()
@@ -35,13 +36,33 @@ class TarantoolService:
             if not self.connection:
                 return None
             result = self.connection.select("cache", key)
-            if result and len(result) > 0:
-                value_packed, expires_at = result[0][1], result[0][2]
-                if expires_at > time.time():
-                    return msgpack.unpackb(value_packed, raw=False)
-                else:
-                    self.delete_sync(key)
-            return None
+            if not result or len(result) == 0:
+                return None
+
+            row = result[0]
+            if len(row) < 3:
+                print("Tarantool GET error: row has less than 3 fields")
+                return None
+
+            value_packed = row[1]
+            expires_at = row[2]
+
+            if not isinstance(value_packed, (bytes, bytearray)):
+                print(f"Tarantool GET error: expected bytes, got {type(value_packed)}")
+                return None
+
+            if time.time() > expires_at:
+                self.delete_sync(key)
+                return None
+
+            return msgpack.unpackb(
+                value_packed,
+                raw=False,
+                strict_map_key=False,
+                max_map_len=1000,
+                max_list_len=1000,
+            )
+
         except Exception as e:
             print(f"Tarantool GET error: {e}")
             return None
@@ -54,7 +75,16 @@ class TarantoolService:
         try:
             if not self.connection:
                 return
-            packed = msgpack.packb(value, use_bin_type=True)
+
+            if not isinstance(value, (dict, list)):
+                print(f"Tarantool SET error: value is not dict/list, got {type(value)}")
+                return
+
+            packed = msgpack.packb(
+                value,
+                use_bin_type=True,
+                strict_types=False,  # разрешает не-JSON типы
+            )
             expires_at = time.time() + ttl
             self.connection.replace("cache", (key, packed, expires_at))
         except Exception as e:

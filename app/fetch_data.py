@@ -1,12 +1,12 @@
+import asyncio
+import logging
+from typing import Any, Dict
+
 import aiohttp
 import xmltodict
-import asyncio
-from typing import Dict, Any
-from app.settings import settings
-from app.utils import cache_response
-from app.utils import clean_xml_dict
-import logging
 
+from app.settings import settings
+from app.utils import cache_response, clean_xml_dict
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 @cache_response(ttl=7200)
 async def fetch_from_dadata(inn: str) -> Dict[str, Any]:
     headers = {
-        "Authorization": f"Token {settings.DADATA_API_KEY}",
-        "Content-Type": "application/json"
+        "Authorization": f"Token {settings.dadata_api_key}",
+        "Content-Type": "application/json",
     }
     payload = {"query": inn}
 
@@ -25,7 +25,7 @@ async def fetch_from_dadata(inn: str) -> Dict[str, Any]:
                 settings.dadata_url,
                 json=payload,
                 headers=headers,
-                timeout=aiohttp.ClientTimeout(total=10)
+                timeout=aiohttp.ClientTimeout(total=10),
             ) as resp:
                 if resp.status != 200:
                     return {"error": f"DaData error: {resp.status}"}
@@ -42,10 +42,10 @@ async def fetch_from_dadata(inn: str) -> Dict[str, Any]:
 async def fetch_from_infosphere(inn: str) -> Dict[str, Any]:
     xml_body = f"""<?xml version="1.0" encoding="UTF-8"?>
     <Request>
-        <UserID>{settings.infosphere_user_id}</UserID>
+        <UserID>{settings.infosphere_login}</UserID>
         <Password>{settings.infosphere_password}</Password>
         <requestType>check</requestType>
-        <sources>fssp</sources>
+        <sources>fssp,bankrot,cbr,egrul,fns,fsin,fmsdb,fms,gosuslugi,mvd,pfr,terrorist</sources>
         <timeout>300</timeout>
         <recursive>0</recursive>
         <async>0</async>
@@ -60,13 +60,13 @@ async def fetch_from_infosphere(inn: str) -> Dict[str, Any]:
                 settings.infosphere_url,
                 data=xml_body,
                 headers={"Content-Type": "application/xml"},
-                timeout=aiohttp.ClientTimeout(total=15)
+                timeout=aiohttp.ClientTimeout(total=60),
             ) as resp:
                 if resp.status != 200:
                     return {"error": f"InfoSphere error: {resp.status}"}
                 text = await resp.text()
                 raw_data = xmltodict.parse(text)
-                cleaned = clean_xml_dict(raw_data)
+                cleaned = clean_xml_dict(raw_data.get("Response").get("Source"))
                 return {"status": "success", "data": cleaned}
     except Exception as e:
         return {"error": f"InfoSphere request failed: {str(e)}"}
@@ -81,7 +81,9 @@ async def fetch_company_info(inn: str) -> Dict[str, Any]:
     dadata_task = asyncio.create_task(fetch_from_dadata(inn))
     infosphere_task = asyncio.create_task(fetch_from_infosphere(inn))
 
-    dadata_res, infosphere_res = await asyncio.gather(dadata_task, infosphere_task, return_exceptions=True)
+    dadata_res, infosphere_res = await asyncio.gather(
+        dadata_task, infosphere_task, return_exceptions=True
+    )
 
     if isinstance(dadata_res, Exception):
         dadata_res = {"error": str(dadata_res)}
@@ -90,8 +92,5 @@ async def fetch_company_info(inn: str) -> Dict[str, Any]:
 
     return {
         "inn": inn,
-        "sources": {
-            "dadata": dadata_res,
-            "infosphere": infosphere_res
-        }
+        "sources": {"dadata": dadata_res, "infosphere": infosphere_res},
     }

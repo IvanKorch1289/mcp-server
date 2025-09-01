@@ -1,10 +1,10 @@
 # settings.py
 import os
-from pydantic_settings import BaseSettings
+
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-
-load_dotenv(".env")
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -23,7 +23,9 @@ class Settings(BaseSettings):
 
     # DaData
     dadata_api_key: str = os.getenv("DADATA_API_KEY")
-    dadata_url: str = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
+    dadata_url: str = (
+        "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
+    )
 
     class Config:
         env_file = ".env"

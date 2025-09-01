@@ -1,30 +1,30 @@
-from typing import Dict, Any, List, TypedDict, Optional
+import json
+from typing import Any, Dict, List, Optional, TypedDict
+
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.tools import StructuredTool
 from langchain_core.runnables import RunnableConfig
 from langchain_gigachat.chat_models.gigachat import GigaChat
-from langgraph.graph import StateGraph, END
+from langgraph.graph import END, StateGraph
 from mcp.server import Server
-from mcp.types import Tool, TextContent
-import json
-import re
-from langchain.tools import StructuredTool
+from mcp.server.stdio import stdio_server
+from mcp.types import TextContent, Tool
 
-from app.settings import settings
-from app.prompts import system_prompt_template
-from app.tools import (
-    count_files_in_directory,
-    get_current_time,
-    read_file_content,
-    create_note,
-    fetch_company_info
-)
+from app.fetch_data import fetch_company_info
 from app.models import (
     CountFilesInput,
-    ReadFileInput,
     CreateNoteInput,
     FetchCompanyInfoInput,
+    ReadFileInput,
 )
-from mcp.server.stdio import stdio_server
+from app.session import add_tool_result, update_session_history
+from app.settings import settings
+from app.tools import (
+    count_files_in_directory,
+    create_note,
+    get_current_time,
+    read_file_content,
+)
 
 # Инициализация MCP-сервера
 mcp_server = Server("gigachat-mcp-server")
@@ -94,10 +94,7 @@ for tool in tools:
 # 2. Инициализация LLM
 # =======================
 
-llm = GigaChat(
-    credentials=settings.giga_api_key,
-    verify_ssl_certs=False
-)
+llm = GigaChat(credentials=settings.giga_api_key, verify_ssl_certs=False)
 
 try:
     llm_with_tools = llm.bind_tools(structured_tools)
@@ -109,12 +106,11 @@ except Exception as e:
 # 3. Промпт и агент
 # =======================
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", system_prompt_template),
-    MessagesPlaceholder(variable_name="chat_history"),
-    ("human", "{input}"),
-    MessagesPlaceholder(variable_name="agent_scratchpad"),
-])
+prompt = ChatPromptTemplate.from_messages(
+    [
+        MessagesPlaceholder(variable_name="chat_history"),
+    ]
+)
 
 agent = prompt | llm_with_tools
 
@@ -123,115 +119,117 @@ agent = prompt | llm_with_tools
 # 4. Состояние графа
 # =======================
 
+
 class AgentState(TypedDict):
     input: str
     session_id: str
-    session: Any  # SessionState from session.py
+    session: Any  # SessionState
     response: Optional[str]
     tool_results: List[Dict[str, Any]]
+    # Добавим флаг, чтобы избежать зацикливания
+    last_tool_call_handled: bool
 
 
 # =======================
-# 5. Вспомогательные функции
+# 5. Узлы графа
 # =======================
 
-def parse_tool_calls(response: str) -> List[tuple]:
-    """
-    Парсит строку вида "ИНСТРУМЕНТ:имя ПАРАМЕТРЫ:{...}"
-    в список кортежей (имя_инструмента, параметры).
-    Поддерживает JSON и разные форматы.
-    """
-    if not response:
-        return []
-
-    patterns = [
-        r'ИНСТРУМЕНТ:([a-zA-Z_][a-zA-Z0-9_]*)\s*ПАРАМЕТРЫ:\s*(\{.*\})',
-        r'TOOL:([a-zA-Z_][a-zA-Z0-9_]*)\s*PARAMS:\s*(\{.*\})',
-    ]
-
-    for pattern in patterns:
-        matches = re.findall(pattern, response, re.DOTALL)
-        if matches:
-            result = []
-            for tool_name, params_str in matches:
-                try:
-                    params_str = params_str.strip()
-                    if params_str.endswith(','):
-                        params_str = params_str[:-1]
-                    params = json.loads(params_str)
-                    result.append((tool_name, params))
-                except json.JSONDecodeError:
-                    result.append((tool_name, {}))
-            return result
-    return []
-
-
-def update_session_history(session, role: str, content: str):
-    """Добавляет сообщение в историю сессии."""
-    session.history.append({
-        "role": role,
-        "content": content,
-        "timestamp": session.last_accessed.isoformat(),
-    })
-    # Ограничиваем длину истории
-    if len(session.history) > 20:
-        session.history = session.history[-20:]
-
-
-# =======================
-# 6. Узлы графа
-# =======================
 
 async def agent_node(state: AgentState) -> Dict[str, Any]:
-    """
-    Узел агента: вызывает LLM для генерации ответа.
-    Может вернуть текст или вызов инструмента.
-    """
     messages = state["session"].to_messages()
+
     try:
-        response = await agent.ainvoke({
-            "input": state["input"],
-            "chat_history": messages,
-            "agent_scratchpad": [],
-        }, config=RunnableConfig())
+        response = await agent.ainvoke(
+            {
+                "chat_history": messages,
+            },
+            config=RunnableConfig(),
+        )
 
-        response_text = ""
+        if hasattr(response, "tool_calls") and response.tool_calls:
+            last_msg = (
+                state["session"].history[-1] if state["session"].history else None
+            )
+            if (
+                last_msg
+                and last_msg["role"] == "function"
+                and last_msg["name"] == response.tool_calls[0]["name"]
+            ):
+                pass  # уже был вызов
+            else:
+                # Форматируем tool_calls для сохранения
+                formatted_calls = [
+                    {
+                        "id": tc["id"],
+                        "name": tc["name"],
+                        "args": tc["args"],
+                        "type": tc.get("type", "function"),
+                    }
+                    for tc in response.tool_calls
+                ]
+                # Сохраняем через update_session_history
+                update_session_history(
+                    state["session"],
+                    "assistant",
+                    "",  # content пустой при tool_calls
+                    tool_calls=formatted_calls,
+                )
 
-        # Новый формат: tool_calls
-        if hasattr(response, 'tool_calls') and response.tool_calls:
-            call = response.tool_calls[0]
-            tool_name = call['name']
-            tool_args = call.get('args', {})
-            response_text = f"ИНСТРУМЕНТ:{tool_name} ПАРАМЕТРЫ:{json.dumps(tool_args)}"
+            return {
+                "response": None,
+                "tool_results": [],
+                "last_tool_call_handled": False,
+            }
 
-        # Старый формат: function_call
-        elif (hasattr(response, 'additional_kwargs') and
-              response.additional_kwargs.get('function_call')):
-            fc = response.additional_kwargs['function_call']
-            tool_name = fc.get('name', '')
-            try:
-                tool_args = json.loads(fc.get('arguments', '{}'))
-            except json.JSONDecodeError:
-                tool_args = {}
-            response_text = f"ИНСТРУМЕНТ:{tool_name} ПАРАМЕТРЫ:{json.dumps(tool_args)}"
+        if hasattr(response, "content") and response.content:
+            update_session_history(state["session"], "assistant", response.content)
+            return {
+                "response": response.content,
+                "last_tool_call_handled": True,
+            }
 
-        # Простой текст
-        elif hasattr(response, 'content') and response.content:
-            response_text = response.content
+        return {
+            "response": "Не удалось сгенерировать ответ.",
+            "last_tool_call_handled": True,
+        }
 
-        else:
-            response_text = "Не удалось обработать запрос."
-
-        return {"response": response_text}
     except Exception as e:
-        return {"response": f"Ошибка агента: {str(e)}"}
+        error_msg = f"Ошибка агента: {str(e)}"
+        update_session_history(state["session"], "assistant", error_msg)
+        return {"response": error_msg, "last_tool_call_handled": True}
 
 
 async def tool_node(state: AgentState) -> Dict[str, Any]:
-    tool_calls = parse_tool_calls(state["response"])
+    history = state["session"].history
+    if not history:
+        return {
+            "tool_results": [],
+            "response": None,
+            "last_tool_call_handled": True,
+        }
+
+    last_msg = history[-1]
+    if last_msg["role"] != "assistant" or not last_msg.get("tool_calls"):
+        return {
+            "tool_results": [],
+            "response": None,
+            "last_tool_call_handled": True,
+        }
+
+    tool_calls = last_msg["tool_calls"]
     results = []
 
-    for tool_name, tool_args in tool_calls:
+    for call in tool_calls:
+        # ✅ Исправлено: name внутри function
+        try:
+            tool_name = call["function"]["name"]
+            # Аргументы — распарсим из JSON
+            args = json.loads(call["function"]["arguments"])
+        except (KeyError, json.JSONDecodeError) as e:
+            error = {"error": f"Invalid tool call format: {str(e)}"}
+            results.append({"tool": "unknown", "result": error})
+            continue
+
         tool = next((t for t in structured_tools if t.name == tool_name), None)
         if not tool:
             error = {"error": f"Unknown tool: {tool_name}"}
@@ -239,25 +237,14 @@ async def tool_node(state: AgentState) -> Dict[str, Any]:
             update_session_history(
                 state["session"],
                 "user",
-                f"❌ Неизвестный инструмент: {tool_name}"
+                f"❌ Неизвестный инструмент: {tool_name}",
             )
             continue
 
         try:
-            if tool_name == "get_current_time":
-                result = await tool.func()
-            else:
-                result = await tool.func(**tool_args)
-
+            result = await tool.func(**args)
             results.append({"tool": tool_name, "result": result})
-
-            # ✅ ВАЖНО: добавляем как user, но с префиксом
-            update_session_history(
-                state["session"],
-                "user",
-                f"[СИСТЕМА] fetch_company_info({tool_args.get('inn')}) выполнен:\n"
-                f"{json.dumps(result, ensure_ascii=False, indent=2)}"
-            )
+            add_tool_result(state["session"], tool_name, result)
 
         except Exception as e:
             error = {"error": str(e)}
@@ -265,17 +252,18 @@ async def tool_node(state: AgentState) -> Dict[str, Any]:
             update_session_history(
                 state["session"],
                 "user",
-                f"[СИСТЕМА] Ошибка в {tool_name}: {str(e)}"
+                f"[СИСТЕМА] Ошибка в {tool_name}: {str(e)}",
             )
 
-    # 🔥 Сбрасываем response, чтобы agent_node вызвался снова
     return {
         "tool_results": results,
-        "response": None
+        "response": None,
+        "last_tool_call_handled": True,
     }
 
+
 # =======================
-# 7. Построение графа
+# 6. Построение графа
 # =======================
 
 workflow = StateGraph(AgentState)
@@ -286,40 +274,35 @@ workflow.add_node("tools", tool_node)
 workflow.set_entry_point("agent")
 
 
+# Условие: нужно ли вызывать инструмент?
 def should_use_tools(state: AgentState) -> str:
-    """Определяет, нужно ли вызывать инструменты."""
-    if not state.get("response"):
-        # Если нет response — это начало или после tool_node
-        # → завершаем (финальный ответ уже сгенерирован ранее)
+    # Если в последнем ответе были tool_calls, и они ещё не обработаны
+    history = state["session"].history
+    if not history:
         return "end"
 
-    # Проверяем, есть ли вызов инструмента
-    if parse_tool_calls(state["response"]):
+    last_msg = history[-1]
+    if last_msg["role"] == "assistant" and last_msg.get("tool_calls"):
         return "tools"
 
-    # Если response есть, но нет вызова — это финальный ответ
     return "end"
 
 
+# Условные рёбра из agent
 workflow.add_conditional_edges(
-    "agent",
-    should_use_tools,
-    {
-        "tools": "tools",
-        "agent": "agent",  # ← после tool_node снова в agent
-        "end": END
-    }
+    "agent", should_use_tools, {"tools": "tools", "end": END}
 )
 
-# После tool_node — всегда возвращаемся к agent
+# 🔁 ВАЖНО: после tools — снова к agent
 workflow.add_edge("tools", "agent")
 
 app_graph = workflow.compile()
 
 
 # =======================
-# 8. Регистрация в MCP
+# 7. Регистрация в MCP
 # =======================
+
 
 @mcp_server.list_tools()
 async def list_tools() -> List[Tool]:
@@ -328,9 +311,7 @@ async def list_tools() -> List[Tool]:
         Tool(
             name=tool["name"],
             description=tool["desc"],
-            inputSchema=(
-                tool["schema"].model_json_schema() if tool["schema"] else {}
-            ),
+            inputSchema=(tool["schema"].model_json_schema() if tool["schema"] else {}),
         )
         for tool in tools
     ]
@@ -341,7 +322,12 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
     """Вызывает инструмент по имени."""
     tool = next((t for t in structured_tools if t.name == name), None)
     if not tool:
-        return [TextContent(type="text", text=json.dumps({"error": f"Unknown tool: {name}"}, ensure_ascii=False))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Unknown tool: {name}"}, ensure_ascii=False),
+            )
+        ]
 
     try:
         if name == "get_current_time":
@@ -350,7 +336,12 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             result = await tool.func(**arguments)
         return [TextContent(type="text", text=json.dumps(result, ensure_ascii=False))]
     except Exception as e:
-        return [TextContent(type="text", text=json.dumps({"error": str(e)}, ensure_ascii=False))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": str(e)}, ensure_ascii=False),
+            )
+        ]
 
 
 # Запуск MCP сервера
