@@ -10,21 +10,21 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
-from app.fetch_data import fetch_company_info
-from app.models import (
+from app.agent.models import (
     CountFilesInput,
     CreateNoteInput,
     FetchCompanyInfoInput,
     ReadFileInput,
 )
-from app.session import add_tool_result, update_session_history
-from app.settings import settings
-from app.tools import (
+from app.agent.session import add_tool_result, update_session_history
+from app.agent.tools import (
     count_files_in_directory,
     create_note,
     get_current_time,
     read_file_content,
 )
+from app.http_tools.fetch_data import fetch_company_info
+from app.settings import settings
 
 # Инициализация MCP-сервера
 mcp_server = Server("gigachat-mcp-server")

@@ -1,4 +1,3 @@
-# settings.py
 import os
 
 from dotenv import load_dotenv
@@ -26,6 +25,9 @@ class Settings(BaseSettings):
     dadata_url: str = (
         "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
     )
+
+    # Casebook
+    casebook_api_key: str = os.getenv("CASEBOOK_API_KEY")
 
     class Config:
         env_file = ".env"

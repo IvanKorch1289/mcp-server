@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import aiofiles
 
-from app.fetch_data import fetch_company_info
+from app.http_tools.fetch_data import fetch_company_info
 
 
 async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:

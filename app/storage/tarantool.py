@@ -58,9 +58,11 @@ class TarantoolService:
             return msgpack.unpackb(
                 value_packed,
                 raw=False,
-                strict_map_key=False,
+                max_str_len=100_000,
+                max_bin_len=100_000,
+                max_array_len=1000,
                 max_map_len=1000,
-                max_list_len=1000,
+                max_ext_len=100_000,
             )
 
         except Exception as e:

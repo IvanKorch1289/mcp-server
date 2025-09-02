@@ -12,7 +12,7 @@ from langchain.schema import (
 )
 from pydantic import BaseModel
 
-from app.prompts import system_prompt_template
+from app.agent.prompts import system_prompt_template
 
 
 class SessionState(BaseModel):

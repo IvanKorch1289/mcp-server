@@ -2,17 +2,19 @@ import asyncio
 import logging
 from typing import Any, Dict
 
-import aiohttp
 import xmltodict
 
+from app.advanced.utils import cache_response, clean_xml_dict
+from app.http_tools.http_client import get_http_client
 from app.settings import settings
-from app.utils import cache_response, clean_xml_dict
 
 logger = logging.getLogger(__name__)
 
 
 @cache_response(ttl=7200)
 async def fetch_from_dadata(inn: str) -> Dict[str, Any]:
+    client = await get_http_client()
+    url = f"{settings.dadata_url}"
     headers = {
         "Authorization": f"Token {settings.dadata_api_key}",
         "Content-Type": "application/json",
@@ -20,26 +22,22 @@ async def fetch_from_dadata(inn: str) -> Dict[str, Any]:
     payload = {"query": inn}
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                settings.dadata_url,
-                json=payload,
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=10),
-            ) as resp:
-                if resp.status != 200:
-                    return {"error": f"DaData error: {resp.status}"}
-                data = await resp.json()
-                suggestions = data.get("suggestions", [])
-                if not suggestions:
-                    return {"error": "No data found in DaData"}
-                return {"status": "success", "data": suggestions[0]["data"]}
+        resp = await client.post(url, json=payload, headers=headers)
+        if resp.status_code != 200:
+            return {"error": f"DaData error: {resp.status_code}"}
+        data = resp.json()
+        suggestions = data.get("suggestions", [])
+        if not suggestions:
+            return {"error": "No data found in DaData"}
+        return {"status": "success", "data": suggestions[0]["data"]}
     except Exception as e:
         return {"error": f"DaData request failed: {str(e)}"}
 
 
 @cache_response(ttl=3600)
 async def fetch_from_infosphere(inn: str) -> Dict[str, Any]:
+    client = await get_http_client()
+    url = settings.infosphere_url
     xml_body = f"""<?xml version="1.0" encoding="UTF-8"?>
     <Request>
         <UserID>{settings.infosphere_login}</UserID>
@@ -55,19 +53,14 @@ async def fetch_from_infosphere(inn: str) -> Dict[str, Any]:
     </Request>"""
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                settings.infosphere_url,
-                data=xml_body,
-                headers={"Content-Type": "application/xml"},
-                timeout=aiohttp.ClientTimeout(total=60),
-            ) as resp:
-                if resp.status != 200:
-                    return {"error": f"InfoSphere error: {resp.status}"}
-                text = await resp.text()
-                raw_data = xmltodict.parse(text)
-                cleaned = clean_xml_dict(raw_data.get("Response").get("Source"))
-                return {"status": "success", "data": cleaned}
+        resp = await client.post(
+            url, content=xml_body, headers={"Content-Type": "application/xml"}
+        )
+        if resp.status_code != 200:
+            return {"error": f"InfoSphere error: {resp.status_code}"}
+        raw_data = xmltodict.parse(resp.text)
+        cleaned = clean_xml_dict(raw_data.get("Response", {}).get("Source", []))
+        return {"status": "success", "data": cleaned}
     except Exception as e:
         return {"error": f"InfoSphere request failed: {str(e)}"}
 
