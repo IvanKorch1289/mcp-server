@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import aiofiles
 
-from app.http_tools.fetch_data import fetch_company_info
+from app.services.fetch_data import fetch_company_info
 
 
 async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
@@ -87,15 +87,24 @@ async def read_file_content(file_path: str) -> Dict[str, Any]:
 async def create_note(
     note_content: str, note_name: Optional[str] = None
 ) -> Dict[str, Any]:
-    """Create a text note with the given content"""
     try:
         if not note_name:
             note_name = f"note_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        else:
+            # Очистка имени
+            note_name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", note_name)
 
         notes_dir = os.path.join(os.getcwd(), "notes")
         os.makedirs(notes_dir, exist_ok=True)
-
         filepath = os.path.join(notes_dir, note_name)
+
+        # Избегаем перезаписи
+        counter = 1
+        original_name, ext = os.path.splitext(note_name)
+        while os.path.exists(filepath):
+            note_name = f"{original_name}_{counter}{ext}"
+            filepath = os.path.join(notes_dir, note_name)
+            counter += 1
 
         async with aiofiles.open(filepath, "w", encoding="utf-8") as f:
             await f.write(note_content)
@@ -107,6 +116,8 @@ async def create_note(
             "size_bytes": len(note_content.encode("utf-8")),
             "message": f"Note created successfully at {filepath}",
         }
+    except PermissionError:
+        return {"error": "Permission denied: cannot create note file"}
     except Exception as e:
         return {"error": f"Error creating note: {str(e)}"}
 

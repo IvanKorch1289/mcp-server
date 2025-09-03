@@ -7,10 +7,11 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.agent.server import run_mcp_server
-from app.http_tools.http_client import close_http_client
 from app.routes.agent_routes import agent_router
 from app.routes.data_routes import data_router
-from app.storage.tarantool import tarantool_service
+from app.routes.utility_routes import utility_router
+from app.services.http_client import AsyncHttpClient
+from app.storage.tarantool import TarantoolClient
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +24,12 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("✅ Приложение запущено")
-    await tarantool_service.connect()
+    await AsyncHttpClient.get_instance()
+    await TarantoolClient.get_instance()
     yield
     print("🛑 Остановка приложения...")
-    await tarantool_service.close()
-    await close_http_client()
+    await TarantoolClient.close_global()
+    await AsyncHttpClient.close_global()
     logger.info("✅ Все соединения закрыты")
 
 
@@ -36,6 +38,7 @@ app = FastAPI(title="GigaChat MCP Server", lifespan=lifespan)
 
 app.include_router(agent_router)
 app.include_router(data_router)
+app.include_router(utility_router)
 
 
 # Основная функция запуска

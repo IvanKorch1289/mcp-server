@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     # Casebook
     casebook_api_key: str = os.getenv("CASEBOOK_API_KEY")
+    casebook_arbitr_url: str = "https://api3.casebook.ru/arbitrage/cases"
 
     class Config:
         env_file = ".env"

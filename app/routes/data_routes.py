@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from app.http_tools.fetch_data import (
+from app.services.fetch_data import (
     fetch_company_info,
+    fetch_from_casebook,
     fetch_from_dadata,
     fetch_from_infosphere,
 )
@@ -23,6 +24,12 @@ async def get_infosphere_data(inn: str):
 async def get_dadata_data(inn: str):
     """Получить данные по клиенту из DaData (для отладки)."""
     return await fetch_from_dadata(inn)
+
+
+@data_router.get("/client/casebook/{inn}")
+async def get_casebook_data(inn: str):
+    """Получить данные по клиенту из Casebook (для отладки)."""
+    return await fetch_from_casebook(inn)
 
 
 @data_router.get("/client/info/{inn}")

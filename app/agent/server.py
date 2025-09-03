@@ -23,7 +23,7 @@ from app.agent.tools import (
     get_current_time,
     read_file_content,
 )
-from app.http_tools.fetch_data import fetch_company_info
+from app.services.fetch_data import fetch_company_info
 from app.settings import settings
 
 # Инициализация MCP-сервера
@@ -194,7 +194,20 @@ async def agent_node(state: AgentState) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        error_msg = f"Ошибка агента: {str(e)}"
+        # 🔽 Лучше обрабатываем ошибку
+        try:
+            # Попробуем извлечь больше контекста
+            error_str = str(e)
+            if "500" in error_str and "Internal Server Error" in error_str:
+                error_msg = (
+                    "Сервер GigaChat временно недоступен. Повторите запрос позже."
+                )
+            else:
+                error_msg = f"Ошибка агента: {str(e)[:500]}..."
+        except Exception as e:
+            error_msg = f"Неизвестная ошибка при обращении к модели: {e}"
+
+        # Сохраняем в историю
         update_session_history(state["session"], "assistant", error_msg)
         return {"response": error_msg, "last_tool_call_handled": True}
 

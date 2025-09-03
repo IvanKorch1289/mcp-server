@@ -16,8 +16,7 @@ from app.agent.prompts import system_prompt_template
 
 
 class SessionState(BaseModel):
-    # Убрали system из history
-    history: list = []  # только user и assistant
+    history: list = []
     context: dict = {}
     created_at: datetime = datetime.now()
     last_accessed: datetime = datetime.now()

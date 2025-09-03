@@ -15,21 +15,29 @@ LOGS_DIR.mkdir(exist_ok=True)
 # Глобальный логгер приложения
 app_logger = logging.getLogger("mcp-server")
 app_logger.setLevel(logging.DEBUG)
-
-# Очищаем дублирующие хэндлеры
 app_logger.handlers.clear()
 
 
 class AppLogger:
-    def __init__(self):
-        self.console = Console()
-        self._setup_handlers()
+    """
+    Универсальный логгер с цветным выводом в терминал и ежедневными файлами.
+    Может использоваться в любом месте приложения.
+    """
+
+    _instance = None
+    _console = Console()
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_handlers()
+        return cls._instance
 
     def _setup_handlers(self):
         """Настройка: цветной терминал + файлы по дням"""
-        # 1. Терминал (цветной вывод)
+        # 1. Терминал
         rich_handler = RichHandler(
-            console=self.console,
+            console=self._console,
             show_time=True,
             show_path=False,
             markup=True,
@@ -61,6 +69,16 @@ class AppLogger:
                 app_logger.removeHandler(handler)
         self._add_timed_file_handler()
 
+    def _ensure_daily_log(self):
+        """Проверяет, нужно ли обновить файл лога (смена дня)"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        current_file = LOGS_DIR / f"{today}.log"
+        if not any(
+            isinstance(h, logging.FileHandler) and Path(h.baseFilename) == current_file
+            for h in app_logger.handlers
+        ):
+            self._renew_file_handler()
+
     def log_request(self, request: httpx.Request):
         """Логирует HTTP-запрос"""
         self._ensure_daily_log()
@@ -79,7 +97,7 @@ class AppLogger:
             table.add_row("Тело", self._truncate(body, 500))
 
         app_logger.info("")
-        self.console.print(table)
+        self._console.print(table)
 
     def log_response(self, response: httpx.Response, duration: float = 0.0):
         """Логирует HTTP-ответ (с обязательным duration)"""
@@ -106,17 +124,7 @@ class AppLogger:
             pass
 
         app_logger.info("")
-        self.console.print(table)
-
-    def _ensure_daily_log(self):
-        """Проверяет, нужно ли обновить файл лога (смена дня)"""
-        today = datetime.now().strftime("%Y-%m-%d")
-        current_file = LOGS_DIR / f"{today}.log"
-        if not any(
-            isinstance(h, logging.FileHandler) and Path(h.baseFilename) == current_file
-            for h in app_logger.handlers
-        ):
-            self._renew_file_handler()
+        self._console.print(table)
 
     def _format_headers(self, headers: httpx.Headers) -> str:
         return "\n".join(
@@ -129,6 +137,8 @@ class AppLogger:
         if len(text) <= max_len:
             return text
         return text[:max_len] + "..."
+
+    # === Удобные методы для общего логирования ===
 
     def info(self, message: str, component: str = "app"):
         self._ensure_daily_log()
@@ -151,5 +161,5 @@ class AppLogger:
         app_logger.exception(f"[{component.upper()}] {message}")
 
 
-# Единый экземпляр логгера
+# Единый экземпляр логгера (можно импортировать где угодно)
 logger = AppLogger()
