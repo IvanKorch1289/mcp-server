@@ -9,7 +9,7 @@ import tarantool
 from app.advanced.logging_client import logger
 from app.settings import settings
 
-# Пул для CPU-bound и blocking-операций
+# Пул для blocking-операций
 _executor = ThreadPoolExecutor(max_workers=3)
 
 
@@ -83,6 +83,9 @@ class TarantoolClient:
         await self._ensure_connection()
 
         def do_get():
+            logger.debug(
+                f"Tarantool.get() called for key='{key}'", component="tarantool_debug"
+            )
             try:
                 if not self._connection:
                     return None
@@ -101,9 +104,10 @@ class TarantoolClient:
 
                 value_packed, expires_at = row[1], row[2]
 
+                # Проверка типа
                 if not isinstance(value_packed, (bytes, bytearray)):
                     logger.warning(
-                        f"Invalid value type for key '{key}': {type(value_packed)}",
+                        f"Invalid value type for key '{key}': {type(value_packed)}, value={repr(value_packed)}",
                         component="tarantool",
                     )
                     return None
@@ -115,8 +119,12 @@ class TarantoolClient:
                         f"Cache expired and deleted: {key}", component="tarantool"
                     )
                     return None
-
-                return msgpack.unpackb(
+                logger.debug(
+                    f"Tarantool.get() unpacking value for key='{key}': type={type(value_packed)}, len={len(value_packed)}",
+                    component="tarantool_debug",
+                )
+                # Распаковываем
+                unpacked = msgpack.unpackb(
                     value_packed,
                     raw=False,
                     max_str_len=100_000,
@@ -125,6 +133,16 @@ class TarantoolClient:
                     max_map_len=1000,
                     max_ext_len=100_000,
                 )
+
+                # Убедимся, что результат — словарь или список
+                if not isinstance(unpacked, (dict, list)):
+                    logger.warning(
+                        f"Unpacked value for key '{key}' is not dict/list: {type(unpacked)}",
+                        component="tarantool",
+                    )
+                    return None
+
+                return unpacked
 
             except tarantool.DatabaseError as e:
                 logger.error(
@@ -139,21 +157,40 @@ class TarantoolClient:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(_executor, do_get)
 
-    async def set(self, key: str, value: Dict[Any, Any], ttl: int = 3600):
-        """
-        Сохраняет значение с TTL.
-        :param key: строковый ключ
-        :param value: dict или list (serializable)
-        :param ttl: время жизни в секундах
-        """
+    async def set(self, key: str, value: Any, ttl: int = 3600):
         await self._ensure_connection()
+
+        # 🔥 Логируем ТИП и значение
+        logger.debug(
+            f"Tarantool.set() called for key='{key}', type(value)={type(value)}, value_preview={str(value)[:200]}",
+            component="tarantool_debug",
+        )
 
         if not isinstance(value, (dict, list)):
             logger.warning(
-                f"Value for key '{key}' is not dict/list: {type(value)}",
+                f"Tarantool.set() value is not dict/list (type={type(value)}). Wrapping.",
                 component="tarantool",
             )
-            return
+            value = {
+                "value": str(value),
+                "type": type(value).__name__,
+                "warning": "Automatically converted non-dict/list value",
+                "timestamp": time.time(),
+            }
+
+        def do_set():
+            try:
+                packed = msgpack.packb(value, use_bin_type=True, strict_types=False)
+                expires_at = time.time() + ttl
+                self._connection.replace(self._space, (key, packed, expires_at))
+                logger.debug(f"Cache set: {key}, ttl={ttl}", component="tarantool")
+            except Exception as e:
+                logger.error(
+                    f"Unexpected error on SET {key}: {e}", component="tarantool"
+                )
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(_executor, do_set)
 
         def do_set():
             try:
@@ -191,8 +228,6 @@ class TarantoolClient:
         """
         Полная инвалидация всех ключей в пространстве 'cache'.
         ⚠️ Опасная операция! Требует подтверждения.
-
-        :param confirm: обязательно `True`, чтобы выполнить
         """
         if not confirm:
             logger.warning(

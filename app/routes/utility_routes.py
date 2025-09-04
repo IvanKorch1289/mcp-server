@@ -10,7 +10,7 @@ utility_router = APIRouter(
 
 
 @utility_router.get("/validate_cache")
-async def validate_cache():
+async def validate_cache(confirm: bool):
     """Инвалидировать кеш."""
     client = await TarantoolClient.get_instance()
-    return await client.invalidate_all_keys()
+    return await client.invalidate_all_keys(confirm)

@@ -92,17 +92,10 @@ class AsyncHttpClient:
         for attempt in range(max_retries):
             try:
                 response = await client.request(method, url, **kwargs)
+
                 if response.status_code == 429 or 500 <= response.status_code < 600:
                     if attempt < max_retries - 1:
                         delay = backoff_factor * (2**attempt)
-                        logger.warning(
-                            "Received %d for %s. Retrying in %.2f seconds... (attempt %d/%d)",
-                            response.status_code,
-                            url,
-                            delay,
-                            attempt + 1,
-                            max_retries,
-                        )
                         await asyncio.sleep(delay)
                         continue
                 response.raise_for_status()
@@ -110,12 +103,14 @@ class AsyncHttpClient:
             except (httpx.RequestError, httpx.TimeoutException) as exc:
                 if attempt == max_retries - 1:
                     logger.error(
-                        "Request failed after %d attempts: %s", max_retries, str(exc)
+                        f"Request failed after {max_retries} attempts: {str(exc)}",
+                        component="_retry_request",
                     )
                     raise
                 delay = backoff_factor * (2**attempt)
                 logger.warning(
-                    "Request error: %s. Retrying in %.2f seconds...", str(exc), delay
+                    f"Request error: {str(exc)}. Retrying in {delay} seconds...",
+                    component="_retry_request",
                 )
                 await asyncio.sleep(delay)
         raise RuntimeError("Unreachable: failed after retries")
@@ -173,13 +168,15 @@ class AsyncHttpClient:
                 json_data = response.json()
 
                 page_items = extract_data(json_data)
+
                 all_data.extend(page_items)
 
                 total_pages = extract_total_pages(json_data)
+
                 if total_pages is None:
                     logger.info(
-                        "Пагинация не обнаружена. Останавливаемся после страницы %d.",
-                        current_page,
+                        f"Пагинация не обнаружена. Останавливаемся после страницы {current_page}.",
+                        component="fetch_all_pages",
                     )
                     break
 

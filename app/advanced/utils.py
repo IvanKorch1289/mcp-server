@@ -1,10 +1,6 @@
 import hashlib
-import json
-import re
 from functools import wraps
-from typing import Callable, List, Tuple
-
-from sqlalchemy.dialects.postgresql.array import Any
+from typing import Any, Callable
 
 from app.advanced.logging_client import logger
 from app.storage.tarantool import TarantoolClient
@@ -103,66 +99,3 @@ def clean_xml_dict(data):
         return [clean_xml_dict(item) for item in data]
     else:
         return data
-
-
-def parse_tool_calls(content: str) -> List[Tuple[str, dict]]:
-    """
-    Парсит вызовы инструментов из текста.
-    Поддерживает форматы:
-      - ИНСТРУМЕНТ: Name ПАРАМЕТРЫ: {"key": "value"}
-      - tool: Name args: {"..."}
-    """
-    if not content or not isinstance(content, str):
-        return []
-
-    # Удаляем экранирование, если JSON сломан
-    content = content.strip()
-
-    patterns = [
-        # Формат: ИНСТРУМЕНТ: Name ПАРАМЕТРЫ: {...}
-        r'инструмент\s*[:：]\s*"?([a-zA-Z_][a-zA-Z0-9_]*)"?[\s:：]*(?:параметры|args|аргументы)?[:：]?\s*(\{.*\})?',
-        # Формат: tool: Name, args: {...}
-        r'tool\s*[:：]\s*"?([a-zA-Z_][a-zA-Z0-9_]*)"?[\s:：]*(?:args|parameters)?[:：]?\s*(\{.*\})?',
-    ]
-
-    for pattern in patterns:
-        match = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
-        if match:
-            tool_name = match.group(1).strip()
-            args_str = (match.group(2) or "{}").strip()
-
-            if not args_str:
-                args_str = "{}"
-
-            # Попробуем распарсить JSON
-            try:
-                if args_str.startswith("{") and args_str.endswith("}"):
-                    args = json.loads(args_str)
-                else:
-                    args = {}
-            except json.JSONDecodeError as e:
-                logger.warning(
-                    f"Invalid JSON in tool call: {args_str} | Error: {e}",
-                    component="tool_parser",
-                )
-                args = {}
-
-            return [(tool_name, args)]
-
-    # Если ничего не нашли — попробуем найти JSON отдельно
-    json_match = re.search(r"(\{.*\})", content, re.DOTALL)
-    if json_match:
-        try:
-            args = json.loads(json_match.group(1))
-            # Попробуем найти имя инструмента отдельно
-            name_match = re.search(
-                r'(?:инструмент|tool)[\s:：]"?([a-zA-Z_][a-zA-Z0-9_]*)"?',
-                content,
-                re.IGNORECASE,
-            )
-            tool_name = name_match.group(1) if name_match else "unknown"
-            return [(tool_name, args)]
-        except Exception:
-            pass
-
-    return []

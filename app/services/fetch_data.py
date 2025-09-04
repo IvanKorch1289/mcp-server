@@ -77,17 +77,23 @@ async def fetch_from_infosphere(inn: str) -> Dict[str, Any]:
 async def fetch_from_casebook(inn: str) -> Dict[str, Any]:
     client = await AsyncHttpClient.get_instance()
     url = settings.casebook_arbitr_url
-    params = {"sideInn": inn, "size": 100, "apikey": settings.casebook_api_key}
+    params = {
+        "sideInn": inn,
+        "size": 100,
+        "apikey": settings.casebook_api_key,
+        "page": 1,
+    }
 
     try:
         # Используем встроенную пагинацию
-        all_cases = await client.fetch_all_pages(url, params=params)
+        all_cases = await client.fetch_all_pages(url=url, params=params)
         return {"status": "success", "data": all_cases}
     except Exception as e:
         logger.exception(f"Casebook request failed for INN {inn}", component="casebook")
         return {"error": f"Casebook request failed: {str(e)}"}
 
 
+@cache_response(ttl=9600)
 async def fetch_company_info(inn: str) -> Dict[str, Any]:
     logger.info(f"Fetching data for INN: {inn}", component="company_info")
 
