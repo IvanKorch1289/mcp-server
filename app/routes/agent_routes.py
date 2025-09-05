@@ -1,93 +1,146 @@
+import uuid
 from datetime import datetime
+from typing import Any, Dict
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.base import BaseMessage, message_to_dict
+from langchain_core.messages.human import HumanMessage
+from langchain_core.runnables.config import RunnableConfig
 
 from app.advanced.logging_client import logger
 from app.agent.models import PromptRequest
 from app.agent.server import app_graph
-from app.agent.session import session_manager, update_session_history
+from app.storage.tarantool import TarantoolClient, save_thread_to_tarantool
 
-agent_router = APIRouter(
-    prefix="/agent", tags=["Агент"], responses={404: {"description": "Не найдено"}}
-)
+agent_router = APIRouter(prefix="/agent", tags=["Агент"])
 
 
 @agent_router.post("/prompt")
 async def process_prompt(request: PromptRequest, bg: BackgroundTasks):
-    """
-    Основной эндпоинт для обработки пользовательского промпта.
-    1. Очищает старые сессии (в фоне)
-    2. Получает или создаёт сессию
-    3. Добавляет запрос в историю
-    4. Запускает LangGraph-агент
-    5. Сохраняет ответ
-    6. Возвращает результат
-    """
-    # Фоновая задача: очистка устаревших сессий
-    bg.add_task(session_manager.cleanup_sessions)
+    thread_id = request.thread_id or f"thread_{uuid.uuid4().hex}"
+    created_at = datetime.now().timestamp()
 
-    # Получаем сессию (создаётся, если не передана или не найдена)
-    session_id, session = await session_manager.get_session(request.session_id)
+    config = RunnableConfig(configurable={"thread_id": thread_id})
 
-    # Добавляем пользовательский ввод в историю
-    update_session_history(session, "user", request.prompt)
-
-    # Начальное состояние для графа
     initial_state = {
         "input": request.prompt,
-        "session_id": session_id,
-        "session": session,
+        "thread_id": thread_id,
+        "messages": [HumanMessage(content=request.prompt)],
         "response": None,
         "tool_results": [],
+        "last_tool_call_handled": True,
+        "tool_call_count": 0,
     }
 
     try:
-        # Выполняем граф агента
-        final_state = await app_graph.ainvoke(initial_state)
+        # Оборачиваем в try-except для перехвата ЛЮБОЙ ошибки
+        final_state = await app_graph.ainvoke(initial_state, config=config)
 
-        # Извлекаем финальный ответ
-        response_text = final_state.get("response", "Не удалось сгенерировать ответ.")
+        # Извлекаем ответ
+        response_text = "Не удалось сгенерировать ответ."
+        messages = final_state.get("messages", [])
 
-        # Сохраняем ответ ассистента в историю
-        update_session_history(session, "assistant", response_text)
+        for msg in reversed(messages):
+            if (
+                isinstance(msg, AIMessage)
+                and msg.content
+                and not str(msg.content).startswith("❌ Ошибка выполнения")
+            ):
+                response_text = msg.content
+                break
 
-        # Логируем для отладки
-        logger.info(f"Session {session_id}: completed prompt processing")
+        # Сохраняем в фоне
+        bg.add_task(
+            save_thread_to_tarantool,
+            thread_id,
+            {
+                "messages": [
+                    message_to_dict(msg) if isinstance(msg, BaseMessage) else msg
+                    for msg in messages
+                ],
+                "created_at": created_at,
+                "input": request.prompt,
+            },
+        )
 
-        # Возвращаем ответ клиенту
         return {
             "response": response_text,
-            "session_id": session_id,
+            "thread_id": thread_id,
             "tools_used": len(final_state.get("tool_results", [])) > 0,
             "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
-        logger.error(f"Error in process_prompt: {e}", exc_info=True)
-        error_msg = "Произошла ошибка при обработке запроса."
-
-        # Добавляем сообщение об ошибке в историю сессии
-        update_session_history(session, "assistant", error_msg)
-
-        raise HTTPException(status_code=500, detail=error_msg) from e
+        logger.error(f"Critical error in process_prompt: {e}", exc_info=True)
+        # Возвращаем чёткую ошибку
+        raise HTTPException(
+            status_code=500, detail=f"Ошибка выполнения агента: {str(e)}"
+        ) from e
 
 
-@agent_router.get("/sessions/{session_id}")
-async def get_session_history(session_id: str):
+@agent_router.get("/thread_history/{thread_id}")
+async def get_thread_history(thread_id: str):
+    # Пробуем разные форматы ключей
+    possible_keys = [
+        f"thread:{thread_id}",
+        f"thread:thread_{thread_id}",
+        f"thread:thread_{thread_id}".encode("utf-8").decode("utf-8"),
+    ]
+
+    client = await TarantoolClient.get_instance()
+    result = None
+
+    # Пробуем все возможные форматы ключей
+    for key in possible_keys:
+        result = await client.get_persistent(key)
+        if result:
+            break
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Тред не найден")
+
+    # Возвращаем найденные данные
+    return result
+
+
+@agent_router.get("/threads")
+async def list_threads() -> Dict[str, Any]:
     """
-    Получить историю сообщений сессии.
-    Полезно для отладки: проверить, попали ли результаты инструментов в историю.
+    Возвращает список всех сохранённых тредов из постоянного хранилища.
     """
-    if session_id not in session_manager.sessions:
-        raise HTTPException(status_code=404, detail="Session not found")
+    try:
+        client = await TarantoolClient.get_instance()
+        threads_data = await client.scan_threads()
 
-    session = session_manager.sessions[session_id]
-    session.last_accessed = datetime.now()  # обновляем время доступа
+        threads = []
+        for item in threads_data:
+            thread_id = item["key"].replace("thread:", "")
+            threads.append(
+                {
+                    "thread_id": thread_id,
+                    "user_prompt": (
+                        item["input"][:100] + "..."
+                        if len(item["input"]) > 100
+                        else item["input"]
+                    ),
+                    "created_at": (
+                        datetime.fromtimestamp(item["created_at"]).isoformat()
+                        if item["created_at"]
+                        else "Неизвестно"
+                    ),
+                    "message_count": item["message_count"],
+                }
+            )
 
-    return {
-        "session_id": session_id,
-        "created_at": session.created_at,
-        "last_accessed": session.last_accessed,
-        "history": session.history,
-        "total_messages": len(session.history),
-    }
+        return {
+            "total": len(threads),
+            "threads": sorted(
+                threads, key=lambda x: x.get("created_at", ""), reverse=True
+            ),
+        }
+    except Exception as e:
+        logger.error(f"Error listing threads: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail="Ошибка при получении списка тредов"
+        ) from e

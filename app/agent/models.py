@@ -22,4 +22,4 @@ class FetchCompanyInfoInput(BaseModel):
 
 class PromptRequest(BaseModel):
     prompt: str
-    session_id: str = None
+    thread_id: Optional[str] = None

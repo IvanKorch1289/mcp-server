@@ -1,40 +1,55 @@
 import json
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Annotated, Any, Dict, List, Optional, TypedDict
 
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.prompts import ChatPromptTemplate
 from langchain.tools import StructuredTool
+from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableConfig
-from langchain_gigachat.chat_models.gigachat import GigaChat
+from langchain_gigachat.chat_models import GigaChat
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
+from app.advanced.logging_client import logger
 from app.agent.models import (
     CountFilesInput,
     CreateNoteInput,
     FetchCompanyInfoInput,
     ReadFileInput,
 )
-from app.agent.session import add_tool_result, update_session_history
+from app.agent.prompts import system_prompt_template
 from app.agent.tools import (
     count_files_in_directory,
     create_note,
+    fetch_company_info_for_analyze,
     get_current_time,
     read_file_content,
 )
-from app.services.fetch_data import fetch_company_info
 from app.settings import settings
 
-# Инициализация MCP-сервера
-mcp_server = Server("gigachat-mcp-server")
+# =======================
+# 1. Состояние: TypedDict + add_messages
+# =======================
+
+
+class AgentState(TypedDict):
+    input: str
+    thread_id: str
+    messages: Annotated[List[dict], add_messages]
+    response: Optional[str]
+    tool_results: List[Dict[str, Any]]
+    last_tool_call_handled: bool
+
 
 # =======================
-# 1. Определение инструментов
+# 2. Инструменты → StructuredTool
 # =======================
 
 tools = [
-    # Файловые инструменты
     {
         "func": count_files_in_directory,
         "schema": CountFilesInput,
@@ -59,280 +74,139 @@ tools = [
         "name": "create_note",
         "desc": "Create a text note with the given content",
     },
-    # Инструмент анализа клиентов
     {
-        "func": fetch_company_info,
+        "func": fetch_company_info_for_analyze,
         "schema": FetchCompanyInfoInput,
         "name": "fetch_company_info",
         "desc": "Get comprehensive company info from DaData and InfoSphere by INN",
     },
 ]
 
-
-# Конвертируем в LangChain StructuredTool
 structured_tools = []
-for tool in tools:
-    if tool["schema"]:
-        structured_tools.append(
-            StructuredTool.from_function(
-                func=tool["func"],
-                name=tool["name"],
-                description=tool["desc"],
-                args_schema=tool["schema"],
-            )
+
+for t in tools:
+    if t["schema"]:
+        tool = StructuredTool(
+            name=t["name"],
+            description=t["desc"],
+            args_schema=t["schema"],
+            coroutine=t["func"],
         )
     else:
-        structured_tools.append(
-            StructuredTool.from_function(
-                func=tool["func"],
-                name=tool["name"],
-                description=tool["desc"],
-            )
+        tool = StructuredTool.from_function(
+            name=t["name"],
+            description=t["desc"],
+            coroutine=t["func"],
         )
+    structured_tools.append(tool)
+
 
 # =======================
-# 2. Инициализация LLM
+# 3. LLM и промпт
 # =======================
 
 llm = GigaChat(credentials=settings.giga_api_key, verify_ssl_certs=False)
+llm_with_tools = llm.bind_tools(structured_tools)
 
-try:
-    llm_with_tools = llm.bind_tools(structured_tools)
-except Exception as e:
-    print(f"Warning: could not bind tools, using raw LLM: {e}")
-    llm_with_tools = llm
-
-# =======================
-# 3. Промпт и агент
-# =======================
 
 prompt = ChatPromptTemplate.from_messages(
-    [
-        MessagesPlaceholder(variable_name="chat_history"),
-    ]
+    [("system", system_prompt_template), ("placeholder", "{messages}")]
 )
-
-agent = prompt | llm_with_tools
-
-
-# =======================
-# 4. Состояние графа
-# =======================
-
-
-class AgentState(TypedDict):
-    input: str
-    session_id: str
-    session: Any  # SessionState
-    response: Optional[str]
-    tool_results: List[Dict[str, Any]]
-    # Добавим флаг, чтобы избежать зацикливания
-    last_tool_call_handled: bool
+agent_runnable = prompt | llm_with_tools
 
 
 # =======================
-# 5. Узлы графа
+# 4. Узел агента
 # =======================
 
 
-async def agent_node(state: AgentState) -> Dict[str, Any]:
-    messages = state["session"].to_messages()
-
+async def agent_node(state: AgentState, config: RunnableConfig) -> Dict[str, Any]:
     try:
-        response = await agent.ainvoke(
-            {
-                "chat_history": messages,
-            },
-            config=RunnableConfig(),
+        response = await agent_runnable.ainvoke(
+            {"messages": state["messages"]},
+            config=config,
         )
-
-        if hasattr(response, "tool_calls") and response.tool_calls:
-            last_msg = (
-                state["session"].history[-1] if state["session"].history else None
-            )
-            if (
-                last_msg
-                and last_msg["role"] == "function"
-                and last_msg["name"] == response.tool_calls[0]["name"]
-            ):
-                pass  # уже был вызов
-            else:
-                # Форматируем tool_calls для сохранения
-                formatted_calls = [
-                    {
-                        "id": tc["id"],
-                        "name": tc["name"],
-                        "args": tc["args"],
-                        "type": tc.get("type", "function"),
-                    }
-                    for tc in response.tool_calls
-                ]
-                # Сохраняем через update_session_history
-                update_session_history(
-                    state["session"],
-                    "assistant",
-                    "",  # content пустой при tool_calls
-                    tool_calls=formatted_calls,
-                )
-
-            return {
-                "response": None,
-                "tool_results": [],
-                "last_tool_call_handled": False,
-            }
-
-        if hasattr(response, "content") and response.content:
-            update_session_history(state["session"], "assistant", response.content)
-            return {
-                "response": response.content,
-                "last_tool_call_handled": True,
-            }
-
-        return {
-            "response": "Не удалось сгенерировать ответ.",
-            "last_tool_call_handled": True,
-        }
-
+        # Добавляем обработку для случаев, когда ответ пустой
+        if isinstance(response, AIMessage) and not response.content:
+            # Если content пустой, но есть tool_calls, это нормально
+            if not getattr(response, "tool_calls", None):
+                # Для "чистых" ответов без содержимого используем placeholder
+                response.content = "Генерация ответа завершена."
+        return {"messages": [response]}
     except Exception as e:
-        # 🔽 Лучше обрабатываем ошибку
-        try:
-            # Попробуем извлечь больше контекста
-            error_str = str(e)
-            if "500" in error_str and "Internal Server Error" in error_str:
-                error_msg = (
-                    "Сервер GigaChat временно недоступен. Повторите запрос позже."
-                )
-            else:
-                error_msg = f"Ошибка агента: {str(e)[:500]}..."
-        except Exception as e:
-            error_msg = f"Неизвестная ошибка при обращении к модели: {e}"
-
-        # Сохраняем в историю
-        update_session_history(state["session"], "assistant", error_msg)
-        return {"response": error_msg, "last_tool_call_handled": True}
-
-
-async def tool_node(state: AgentState) -> Dict[str, Any]:
-    history = state["session"].history
-    if not history:
-        return {
-            "tool_results": [],
-            "response": None,
-            "last_tool_call_handled": True,
-        }
-
-    last_msg = history[-1]
-    if last_msg["role"] != "assistant" or not last_msg.get("tool_calls"):
-        return {
-            "tool_results": [],
-            "response": None,
-            "last_tool_call_handled": True,
-        }
-
-    tool_calls = last_msg["tool_calls"]
-    results = []
-
-    for call in tool_calls:
-        # ✅ Исправлено: name внутри function
-        try:
-            tool_name = call["function"]["name"]
-            # Аргументы — распарсим из JSON
-            args = json.loads(call["function"]["arguments"])
-        except (KeyError, json.JSONDecodeError) as e:
-            error = {"error": f"Invalid tool call format: {str(e)}"}
-            results.append({"tool": "unknown", "result": error})
-            continue
-
-        tool = next((t for t in structured_tools if t.name == tool_name), None)
-        if not tool:
-            error = {"error": f"Unknown tool: {tool_name}"}
-            results.append({"tool": tool_name, "result": error})
-            update_session_history(
-                state["session"],
-                "user",
-                f"❌ Неизвестный инструмент: {tool_name}",
-            )
-            continue
-
-        try:
-            result = await tool.func(**args)
-            results.append({"tool": tool_name, "result": result})
-            add_tool_result(state["session"], tool_name, result)
-
-        except Exception as e:
-            error = {"error": str(e)}
-            results.append({"tool": tool_name, "result": error})
-            update_session_history(
-                state["session"],
-                "user",
-                f"[СИСТЕМА] Ошибка в {tool_name}: {str(e)}",
-            )
-
-    return {
-        "tool_results": results,
-        "response": None,
-        "last_tool_call_handled": True,
-    }
+        error_msg = f"Ошибка LLM: {str(e)[:500]}"
+        logger.error(error_msg, exc_info=True)
+        return {"messages": [AIMessage(content=error_msg)]}
 
 
 # =======================
-# 6. Построение графа
+# 5. Узел инструментов
 # =======================
 
-workflow = StateGraph(AgentState)
-
-workflow.add_node("agent", agent_node)
-workflow.add_node("tools", tool_node)
-
-workflow.set_entry_point("agent")
+tool_node = ToolNode(structured_tools)
 
 
-# Условие: нужно ли вызывать инструмент?
+# =======================
+# 6. Условия перехода
+# =======================
+
+
 def should_use_tools(state: AgentState) -> str:
-    # Если в последнем ответе были tool_calls, и они ещё не обработаны
-    history = state["session"].history
-    if not history:
+    # Проверяем лимит вызовов
+    if state.get("tool_call_count", 0) >= 5:
         return "end"
 
-    last_msg = history[-1]
-    if last_msg["role"] == "assistant" and last_msg.get("tool_calls"):
+    # Проверяем, есть ли новые вызовы инструментов
+    messages = state["messages"]
+    if not messages:
+        return "end"
+
+    last_msg = messages[-1]
+    if isinstance(last_msg, AIMessage) and getattr(last_msg, "tool_calls", None):
         return "tools"
 
     return "end"
 
 
-# Условные рёбра из agent
+# =======================
+# 7. Построение графа
+# =======================
+
+workflow = StateGraph(AgentState)
+memory_saver = MemorySaver()
+
+workflow.add_node("agent", agent_node)
+workflow.add_node("tools", tool_node)
+workflow.set_entry_point("agent")
 workflow.add_conditional_edges(
     "agent", should_use_tools, {"tools": "tools", "end": END}
 )
-
-# 🔁 ВАЖНО: после tools — снова к agent
 workflow.add_edge("tools", "agent")
 
-app_graph = workflow.compile()
+app_graph = workflow.compile(checkpointer=memory_saver)
 
 
 # =======================
-# 7. Регистрация в MCP
+# 8. MCP-сервер
 # =======================
+
+mcp_server = Server("gigachat-mcp-server")
 
 
 @mcp_server.list_tools()
 async def list_tools() -> List[Tool]:
-    """Возвращает список всех доступных инструментов."""
     return [
         Tool(
-            name=tool["name"],
-            description=tool["desc"],
-            inputSchema=(tool["schema"].model_json_schema() if tool["schema"] else {}),
+            name=t["name"],
+            description=t["desc"],
+            inputSchema=t["schema"].model_json_schema() if t["schema"] else {},
         )
-        for tool in tools
+        for t in tools
     ]
 
 
 @mcp_server.call_tool()
 async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
-    """Вызывает инструмент по имени."""
     tool = next((t for t in structured_tools if t.name == name), None)
     if not tool:
         return [
@@ -343,26 +217,26 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
         ]
 
     try:
-        if name == "get_current_time":
-            result = await tool.func()
-        else:
-            result = await tool.func(**arguments)
-        return [TextContent(type="text", text=json.dumps(result, ensure_ascii=False))]
-    except Exception as e:
+        result = await tool.ainvoke(arguments)
         return [
             TextContent(
                 type="text",
-                text=json.dumps({"error": str(e)}, ensure_ascii=False),
+                text=json.dumps(result, ensure_ascii=False, indent=2, default=str),
+            )
+        ]
+    except Exception as e:
+        return [
+            TextContent(
+                type="text", text=json.dumps({"error": str(e)}, ensure_ascii=False)
             )
         ]
 
 
-# Запуск MCP сервера
+# =======================
+# 9. Запуск MCP
+# =======================
+
+
 async def run_mcp_server():
-    """Run the MCP server over stdio"""
     async with stdio_server() as (read_stream, write_stream):
-        await mcp_server.run(
-            read_stream=read_stream,
-            write_stream=write_stream,
-            initialization_options=None,
-        )
+        await mcp_server.run(read_stream, write_stream, None)

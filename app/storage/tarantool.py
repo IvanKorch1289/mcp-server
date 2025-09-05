@@ -1,9 +1,10 @@
 import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import msgpack
+from langchain_core.messages import BaseMessage, message_to_dict
 
 import tarantool
 from app.advanced.logging_client import logger
@@ -160,42 +161,12 @@ class TarantoolClient:
     async def set(self, key: str, value: Any, ttl: int = 3600):
         await self._ensure_connection()
 
-        # 🔥 Логируем ТИП и значение
-        logger.debug(
-            f"Tarantool.set() called for key='{key}', type(value)={type(value)}, value_preview={str(value)[:200]}",
-            component="tarantool_debug",
-        )
-
-        if not isinstance(value, (dict, list)):
-            logger.warning(
-                f"Tarantool.set() value is not dict/list (type={type(value)}). Wrapping.",
-                component="tarantool",
-            )
-            value = {
-                "value": str(value),
-                "type": type(value).__name__,
-                "warning": "Automatically converted non-dict/list value",
-                "timestamp": time.time(),
-            }
+        # Если ttl не задан — используем большое число (10 лет)
+        expires_at = time.time() + (ttl if ttl is not None else 315360000)
 
         def do_set():
             try:
                 packed = msgpack.packb(value, use_bin_type=True, strict_types=False)
-                expires_at = time.time() + ttl
-                self._connection.replace(self._space, (key, packed, expires_at))
-                logger.debug(f"Cache set: {key}, ttl={ttl}", component="tarantool")
-            except Exception as e:
-                logger.error(
-                    f"Unexpected error on SET {key}: {e}", component="tarantool"
-                )
-
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(_executor, do_set)
-
-        def do_set():
-            try:
-                packed = msgpack.packb(value, use_bin_type=True, strict_types=False)
-                expires_at = time.time() + ttl
                 self._connection.replace(self._space, (key, packed, expires_at))
                 logger.debug(f"Cache set: {key}, ttl={ttl}", component="tarantool")
             except tarantool.DatabaseError as e:
@@ -223,6 +194,78 @@ class TarantoolClient:
 
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(_executor, do_delete)
+
+    async def set_persistent(self, key: str, value: Any):
+        """Сохраняет данные в постоянное хранилище (без TTL, не удаляется при invalidate)"""
+        await self._ensure_connection()
+
+        def do_set():
+            try:
+                packed = msgpack.packb(value, use_bin_type=True, strict_types=False)
+                self._connection.replace("persistent", (key, packed))
+                logger.debug(f"Persistent saved: {key}", component="tarantool")
+            except Exception as e:
+                logger.error(
+                    f"Failed to save persistent {key}: {e}", component="tarantool"
+                )
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(_executor, do_set)
+
+    async def get_persistent(self, key: str) -> Optional[Dict[Any, Any]]:
+        """Получает данные из постоянного хранилища"""
+        await self._ensure_connection()
+
+        def do_get():
+            try:
+                result = self._connection.select("persistent", key)
+                if not result:
+                    return None
+                packed = result[0][1]
+                if not isinstance(packed, (bytes, bytearray)):
+                    return None
+                return msgpack.unpackb(packed, raw=False)
+            except Exception as e:
+                logger.error(f"Failed to get persistent {key}: {e}")
+                return None
+
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(_executor, do_get)
+
+    async def scan_threads(self) -> List[Dict[str, Any]]:
+        """Сканирует все треды в постоянном хранилище"""
+        await self._ensure_connection()
+
+        def do_scan():
+            try:
+                result = self._connection.select("persistent")
+                threads = []
+                for row in result:
+                    if len(row) >= 2 and row[0].startswith("thread:"):
+                        try:
+                            # Пытаемся распаковать значение
+                            if isinstance(row[1], (bytes, bytearray)):
+                                value = msgpack.unpackb(row[1], raw=False)
+                                if isinstance(value, dict) and "input" in value:
+                                    threads.append(
+                                        {
+                                            "key": row[0],
+                                            "input": value.get("input", "Без запроса"),
+                                            "created_at": value.get("created_at", 0),
+                                            "message_count": len(
+                                                value.get("messages", [])
+                                            ),
+                                        }
+                                    )
+                        except Exception as e:
+                            logger.warning(f"Failed to unpack thread {row[0]}: {e}")
+                return threads
+            except Exception as e:
+                logger.error(f"Error scanning threads: {e}")
+                return []
+
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(_executor, do_scan)
 
     async def invalidate_all_keys(self, confirm: bool = False):
         """
@@ -275,3 +318,60 @@ class TarantoolClient:
         if cls._instance is not None:
             await cls._instance.close()
             cls._instance = None
+
+
+async def save_thread_to_tarantool(thread_id: str, data: Dict[str, Any]):
+    client = await TarantoolClient.get_instance()
+
+    # Нормализуем thread_id
+    if thread_id.startswith("thread_"):
+        normalized_id = thread_id
+    else:
+        normalized_id = f"thread_{thread_id}"
+
+    # Обрабатываем сообщения: поддерживаем BaseMessage, dict, и другие форматы
+    processed_messages = []
+    for msg in data["messages"]:
+        try:
+            if isinstance(msg, BaseMessage):
+                # Если это объект сообщения — сериализуем через message_to_dict
+                processed_messages.append(message_to_dict(msg))
+            elif isinstance(msg, dict):
+                # Если уже dict — проверяем наличие 'type' как ключа
+                if "type" in msg or "data" in msg:
+                    # Уже сериализованное сообщение
+                    processed_messages.append(msg)
+                else:
+                    # Это не сообщение, а, например, входной запрос
+                    processed_messages.append(
+                        {
+                            "type": "human",
+                            "data": {"content": str(msg.get("input", msg))},
+                        }
+                    )
+            else:
+                # Резервный случай
+                processed_messages.append(
+                    {"type": "unknown", "data": {"content": str(msg)}}
+                )
+        except Exception as e:
+            logger.warning(f"Failed to serialize message: {e}")
+            processed_messages.append(
+                {
+                    "type": "error",
+                    "data": {"content": f"Serialization failed: {str(e)}"},
+                }
+            )
+
+    # Сохраняем с нормализованным ключом
+    await client.set_persistent(
+        f"thread:{normalized_id}",
+        {
+            "messages": processed_messages,
+            "created_at": data["created_at"],
+            "input": data["input"],
+            "thread_id": normalized_id,
+        },
+    )
+
+    logger.info(f"Thread saved: thread:{normalized_id}")

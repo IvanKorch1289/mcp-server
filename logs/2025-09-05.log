@@ -1,0 +1,1341 @@
+[09:51:18] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[09:53:22] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[09:54:07] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:00:53] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:04:10] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:09:18] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:09:22] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:09:34] ERROR | mcp-server | [APP] Error in process_prompt: 'HumanMessage' object is not subscriptable
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 39, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2939, in astream
+    async for _ in runner.atick(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 295, in atick
+    await arun_with_retry(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 137, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 706, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 474, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 131, in agent_node
+    if msg["role"] == "user":
+       ~~~^^^^^^^^
+TypeError: 'HumanMessage' object is not subscriptable
+During task with name 'agent' and id '989e35d1-63d4-6150-fea3-4c83d61ab43d'
+[10:12:43] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:13:10] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:13:15] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:13:15 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 159, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:13:15 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '3d83bc08-fd0d-4d4b-8fe4-e4f1d4b38460', 'x-session-id': '69dbeced-561e-441d-9b77-117354834859', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[10:13:16] ERROR | mcp-server | [APP] Error in process_prompt: 'AIMessage' object is not subscriptable
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 39, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2939, in astream
+    async for _ in runner.atick(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 295, in atick
+    await arun_with_retry(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 137, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 712, in ainvoke
+    input = await step.ainvoke(input, config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 474, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/graph/_branch.py", line 191, in _aroute
+    result = await self.path.ainvoke(value, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 465, in ainvoke
+    ret = await asyncio.create_task(coro, context=context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/config.py", line 617, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/config.py", line 608, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 216, in should_use_tools
+    if last_msg["role"] == "assistant" and last_msg.get("tool_calls"):
+       ~~~~~~~~^^^^^^^^
+TypeError: 'AIMessage' object is not subscriptable
+During task with name 'agent' and id '830a8172-8c10-3040-0920-9948aa48f8b0'
+[10:16:05] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:16:07] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:17:12] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:17:12 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 133, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:17:12 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '7d4529f5-fc87-4c02-bb35-1ee6499024a3', 'x-session-id': 'b66d622a-cf95-40e0-910c-3e8878b6d20e', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[10:17:14] ERROR | mcp-server | [APP] Error in process_prompt: 'AIMessage' object is not subscriptable
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 39, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2939, in astream
+    async for _ in runner.atick(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 295, in atick
+    await arun_with_retry(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 137, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 712, in ainvoke
+    input = await step.ainvoke(input, config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 474, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/graph/_branch.py", line 191, in _aroute
+    result = await self.path.ainvoke(value, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 465, in ainvoke
+    ret = await asyncio.create_task(coro, context=context)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/config.py", line 617, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/config.py", line 608, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 174, in should_use_tools
+    if last_msg["role"] == "assistant" and last_msg.get("tool_calls"):
+       ~~~~~~~~^^^^^^^^
+TypeError: 'AIMessage' object is not subscriptable
+During task with name 'agent' and id 'c06d295b-14e8-fde6-30ba-59b3c3273566'
+[10:19:27] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:19:40] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:19:44] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:19:44 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 133, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:19:44 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '76d5e19d-406e-4a8d-90fd-41979d6edcf4', 'x-session-id': '112d4f5e-c808-45bb-ae04-06c7148cf7de', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[10:19:45] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.set() called for key='thread:string', type(value)=<class 'dict'>, value_preview={'messages': [HumanMessage(content='проанализируй клиента 2346010503 и ссоздай заметку с реузльатом. В название добавь текущее время и ИНН клиента', additional_kwargs={}, response_metadata={}, id='c61
+[10:19:45] ERROR | mcp-server | [TARANTOOL] Unexpected error on SET thread:string: can not serialize 'HumanMessage' object
+[10:19:45] ERROR | mcp-server | [TARANTOOL] Unexpected error on SET thread:string: can not serialize 'HumanMessage' object
+[10:24:06] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:25:25] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:26:04] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:26:04 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 133, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: system message must be the first message"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 07:26:04 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '84', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '5dc876fd-0e95-4e1f-be05-1fee88a4eeb7', 'x-session-id': '5f657806-e621-4dbb-9676-e642765dc9e2', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[10:26:06] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.set() called for key='thread:string', type(value)=<class 'dict'>, value_preview={'messages': [{'type': 'human', 'data': {'content': 'выполни анализ клиента 2346010503', 'additional_kwargs': {}, 'response_metadata': {}, 'type': 'human', 'name': None, 'id': '945e0df2-6db4-4994-bd8d
+[10:26:06] ERROR | mcp-server | [TARANTOOL] Unexpected error on SET thread:string: unsupported operand type(s) for +: 'float' and 'NoneType'
+[10:26:06] ERROR | mcp-server | [TARANTOOL] Unexpected error on SET thread:string: unsupported operand type(s) for +: 'float' and 'NoneType'
+[10:41:17] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[10:41:22] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[10:42:03] DEBUG | mcp-server | [TARANTOOL] Cache set: thread:string, ttl=None
+[10:42:11] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[11:02:41] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[11:03:24] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:03:24 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '105', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 129, in agent_node
+    response_obj: AgentResponse = await agent_runnable.ainvoke(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:03:24 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '105', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '03e1fafa-fae9-4b4b-8145-b8510bfe6140', 'x-session-id': '05811685-bfb9-49f8-8ff0-ad5aeac4cad1', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[11:03:25] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string
+[11:04:24] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): (32, "/opt/tarantool/init.lua:42: attempt to index global 'msgpack' (a nil value)")
+[11:11:35] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[11:15:37] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[11:17:09] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:17:09 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '105', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 129, in agent_node
+    response: AgentResponse = await agent_runnable.ainvoke(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:17:09 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '105', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': 'c072964c-bf32-4c5a-b52c-65bc4c6d9e9e', 'x-session-id': '9dae8c85-7de4-4e91-96a0-6f4680aecc21', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[11:17:10] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string123
+[11:17:39] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): (32, "/opt/tarantool/init.lua:42: attempt to index global 'msgpack' (a nil value)")
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 109, in _fetch
+    res = client._connection.call("list_persistent_threads")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1488, in call
+    response = self._send_request(request, on_push, on_push_ctx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1397, in _send_request
+    return self._send_request_wo_reconnect(request, on_push, on_push_ctx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1285, in _send_request_wo_reconnect
+    response = request.response_class(self, self._read_response())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/response.py", line 157, in __init__
+    raise DatabaseError(self._return_code,
+tarantool.error.DatabaseError: (32, "/opt/tarantool/init.lua:42: attempt to index global 'msgpack' (a nil value)")
+[11:24:01] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[11:24:05] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[11:24:12] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties.company_info.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:24:12 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '129', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 129, in agent_node
+    response: AgentResponse = await agent_runnable.ainvoke(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 418, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Field \'properties.tool_results.items.properties.result.properties.company_info.properties\' is missing"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 08:24:12 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '129', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '7b9ac504-4177-43ca-9c9d-85fa60ac156d', 'x-session-id': '4a1dbfb3-6b8a-4993-afae-a5b3df7b621d', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[11:24:13] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string123
+[11:24:56] WARNING | mcp-server | [TARANTOOL] All cache keys invalidated (space 'cache' truncated)
+[11:25:13] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 109, in _fetch
+    res = client._connection.call("list_persistent_threads")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1488, in call
+    response = self._send_request(request, on_push, on_push_ctx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1397, in _send_request
+    return self._send_request_wo_reconnect(request, on_push, on_push_ctx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1285, in _send_request_wo_reconnect
+    response = request.response_class(self, self._read_response())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/response.py", line 157, in __init__
+    raise DatabaseError(self._return_code,
+tarantool.error.DatabaseError: (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+[11:41:23] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[11:49:40] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[11:50:09] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string123
+[11:52:14] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string12453
+[11:53:38] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 95, in _fetch
+    res = client._connection.call("list_persistent_threads")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1488, in call
+    response = self._send_request(request, on_push, on_push_ctx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1397, in _send_request
+    return self._send_request_wo_reconnect(request, on_push, on_push_ctx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1285, in _send_request_wo_reconnect
+    response = request.response_class(self, self._read_response())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/response.py", line 157, in __init__
+    raise DatabaseError(self._return_code,
+tarantool.error.DatabaseError: (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+[11:57:59] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[11:58:52] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[11:59:18] ERROR | mcp-server | [APP] Ошибка LLM: "Input to ChatPromptTemplate is missing variables {'имя_файла'}.  Expected: ['имя_файла'] Received: ['messages']\nNote: if you intended {имя_файла} to be part of the string and not a variable, please escape it with double curly braces like: '{{имя_файла}}'.\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT "
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 126, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 242, in ainvoke
+    return await self._acall_with_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 2004, in _acall_with_config
+    output: Output = await coro_with_context(coro, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 195, in _aformat_prompt_with_error_handling
+    inner_input_ = self._validate_input(inner_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 183, in _validate_input
+    raise KeyError(
+KeyError: "Input to ChatPromptTemplate is missing variables {'имя_файла'}.  Expected: ['имя_файла'] Received: ['messages']\nNote: if you intended {имя_файла} to be part of the string and not a variable, please escape it with double curly braces like: '{{имя_файла}}'.\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT "
+[11:59:19] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string12453
+[12:08:05] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:08:08] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:08:24] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string12453
+[12:10:07] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string1232453
+[12:10:45] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 95, in _fetch
+    res = client._connection.call("list_persistent_threads")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1488, in call
+    response = self._send_request(request, on_push, on_push_ctx)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1397, in _send_request
+    return self._send_request_wo_reconnect(request, on_push, on_push_ctx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/connection.py", line 1285, in _send_request_wo_reconnect
+    response = request.response_class(self, self._read_response())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/tarantool/response.py", line 157, in __init__
+    raise DatabaseError(self._return_code,
+tarantool.error.DatabaseError: (32, "/opt/tarantool/init.lua:44: attempt to index global 'msgpack' (a nil value)")
+[12:14:38] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:14:41] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:15:02] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string1232453
+[12:16:12] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:19:11] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:19:31] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:string1232453
+[12:19:54] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:90-4980234908
+[12:22:05] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:90-цукцуу
+[12:36:35] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:38:57] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:39:05] ERROR | mcp-server | [APP] Ошибка LLM: "Input to ChatPromptTemplate is missing variables {'get_current_time()'}.  Expected: ['get_current_time()'] Received: ['messages']\nNote: if you intended {get_current_time()} to be part of the string and not a variable, please escape it with double curly braces like: '{{get_current_time()}}'.\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT "
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 131, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 242, in ainvoke
+    return await self._acall_with_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 2004, in _acall_with_config
+    output: Output = await coro_with_context(coro, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 195, in _aformat_prompt_with_error_handling
+    inner_input_ = self._validate_input(inner_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/prompts/base.py", line 183, in _validate_input
+    raise KeyError(
+KeyError: "Input to ChatPromptTemplate is missing variables {'get_current_time()'}.  Expected: ['get_current_time()'] Received: ['messages']\nNote: if you intended {get_current_time()} to be part of the string and not a variable, please escape it with double curly braces like: '{{get_current_time()}}'.\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT "
+[12:39:06] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:90-424цуаыв
+[12:39:36] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:39:39] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:39:56] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[12:41:34] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:42:55] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:43:23] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[12:43:54] ERROR | mcp-server | [APP] Error fetching thread 234234234sdf: 404: Тред не найден
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 72, in get_thread_history
+    raise HTTPException(status_code=404, detail="Тред не найден")
+fastapi.exceptions.HTTPException: 404: Тред не найден
+[12:44:29] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:43erwfds
+[12:44:55] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:43erwfds
+[12:46:23] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:46:32] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:46:41] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 429, b'{"status":429,"message":"Too Many Requests"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 09:46:41 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '45', 'connection': 'keep-alive', 'x-request-id': 'e8d79167-1693-417d-8507-17118329d310', 'x-session-id': '96776e68-b286-467e-844c-caa5e6d0a42a', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'})
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 140, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 413, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 429, b'{"status":429,"message":"Too Many Requests"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 09:46:41 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '45', 'connection': 'keep-alive', 'x-request-id': 'e8d79167-1693-417d-8507-17118329d310', 'x-session-id': '96776e68-b286-467e-844c-caa5e6d0a42a', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[12:46:43] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:345345вап
+[12:46:46] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[12:57:19] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[12:57:22] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[12:57:34] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[12:57:46] ERROR | mcp-server | [APP] Error fetching thread ываы: 404: Тред не найден
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 72, in get_thread_history
+    raise HTTPException(status_code=404, detail="Тред не найден")
+fastapi.exceptions.HTTPException: 404: Тред не найден
+[13:01:30] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[13:01:32] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[13:01:43] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:вапываыу
+[13:02:53] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[13:02:56] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[13:03:14] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:345кеыва
+[13:45:57] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[13:46:01] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[13:46:18] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[13:46:18] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[13:46:18] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 5009106586
+[13:46:18] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1255df14518c29ac91141cf72f943ce7'
+[13:46:18] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1255df14518c29ac91141cf72f943ce7'
+[13:46:18] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1255df14518c29ac91141cf72f943ce7'
+[13:46:18] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:9f481f052290be905f2a2959f1cfa8ab'
+[13:46:18] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:5009106586 → cache:1255df14518c29ac91141cf72f943ce7
+[13:46:18] ERROR | mcp-server | [TARANTOOL] Unexpected error on GET cache:9f481f052290be905f2a2959f1cfa8ab: 'int' object has no attribute 'get'
+[13:46:18] ERROR | mcp-server | [TARANTOOL] Unexpected error on GET cache:939e55e6dd6de19096d59df1bb072648: 3 exceeds max_map_len(2)
+[13:46:18] INFO | mcp-server | 
+[13:46:18] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:5009106586 → cache:9f481f052290be905f2a2959f1cfa8ab
+[13:46:18] INFO | mcp-server | 
+[13:46:18] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:5009106586 → cache:939e55e6dd6de19096d59df1bb072648
+[13:46:18] INFO | mcp-server | 
+[13:46:19] INFO | mcp-server | 
+[13:46:19] INFO | mcp-server | 
+[13:46:19] INFO | mcp-server | [FETCH_ALL_PAGES] Пагинация не обнаружена. Останавливаемся после страницы 1.
+[13:46:19] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:939e55e6dd6de19096d59df1bb072648, ttl=7200
+[13:46:19] DEBUG | mcp-server | [CACHE] Cache SET: cache:939e55e6dd6de19096d59df1bb072648, ttl=7200
+[13:46:19] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:9f481f052290be905f2a2959f1cfa8ab, ttl=9600
+[13:46:19] DEBUG | mcp-server | [CACHE] Cache SET: cache:9f481f052290be905f2a2959f1cfa8ab, ttl=9600
+[13:46:33] INFO | mcp-server | 
+[13:46:34] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:1255df14518c29ac91141cf72f943ce7, ttl=3600
+[13:46:34] DEBUG | mcp-server | [CACHE] Cache SET: cache:1255df14518c29ac91141cf72f943ce7, ttl=3600
+[13:46:34] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:1037f0be5169c9aec58b4586941259da, ttl=9600
+[13:46:34] DEBUG | mcp-server | [CACHE] Cache SET: cache:1037f0be5169c9aec58b4586941259da, ttl=9600
+[13:46:50] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:23453rgt
+[13:49:22] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[13:49:22] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61326
+[13:49:22] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[13:50:44] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[13:52:10] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 10:52:10 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'a
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 140, in agent_node
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 413, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 10:52:10 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '37ae2680-c7a1-4fd7-94b8-aa02deca6e32', 'x-session-id': '02a572ec-f5d3-4187-abcd-db62a3a1941f', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[13:52:13] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:43цукым
+[13:52:32] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:3йцуаывмс
+[13:53:04] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): list index out of range
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 99, in _fetch
+    }
+      
+IndexError: list index out of range
+[14:01:12] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:01:17] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:01:22] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): list index out of range
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 123, in _fetch
+    "thread_id": row[0],
+                 ~~~^^^
+IndexError: list index out of range
+[14:02:24] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[14:02:24] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61326
+[14:02:24] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[14:04:20] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): list index out of range
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 123, in _fetch
+    "thread_id": row[0],
+                 ~~~^^^
+IndexError: list index out of range
+[14:07:18] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:07:21] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:07:31] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[14:07:31] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61326
+[14:07:31] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[14:08:02] ERROR | mcp-server | [APP] Error fetching thread 45к4еasfg2342rыап345: 404: Тред не найден
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 86, in get_thread_history
+    raise HTTPException(status_code=404, detail="Тред не найден")
+fastapi.exceptions.HTTPException: 404: Тред не найден
+[14:08:15] ERROR | mcp-server | [APP] Error fetching thread 45к4еasfg2342rыап345: 404: Тред не найден
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 86, in get_thread_history
+    raise HTTPException(status_code=404, detail="Тред не найден")
+fastapi.exceptions.HTTPException: 404: Тред не найден
+[14:10:24] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:10:31] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:11:06] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[14:11:06] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61326
+[14:11:06] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[14:16:49] ERROR | mcp-server | [APP] Error fetching thread 24цуаывм: 404: Тред не найден
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 87, in get_thread_history
+    raise HTTPException(status_code=404, detail="Тред не найден")
+fastapi.exceptions.HTTPException: 404: Тред не найден
+[14:16:56] ERROR | mcp-server | [APP] Failed to call list_persistent_threads(): list index out of range
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 124, in _fetch
+    "thread_id": row[0],
+                 ~~~^^^
+IndexError: list index out of range
+[14:24:10] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:28:04] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:28:20] WARNING | mcp-server | [TARANTOOL] Invalid thread row: []
+[14:30:45] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:31:07] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:31:10] WARNING | mcp-server | [TARANTOOL] Invalid thread row: []
+[14:31:14] WARNING | mcp-server | [TARANTOOL] Invalid thread row: []
+[14:31:29] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:32:37] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:32:50] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[14:32:50] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 5009106586
+[14:32:50] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:9f481f052290be905f2a2959f1cfa8ab'
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:5009106586 → cache:939e55e6dd6de19096d59df1bb072648
+[14:32:50] INFO | mcp-server | 
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:5009106586 → cache:1255df14518c29ac91141cf72f943ce7
+[14:32:50] INFO | mcp-server | 
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:5009106586 → cache:9f481f052290be905f2a2959f1cfa8ab
+[14:32:50] INFO | mcp-server | 
+[14:32:50] INFO | mcp-server | 
+[14:32:50] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:939e55e6dd6de19096d59df1bb072648, ttl=7200
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache SET: cache:939e55e6dd6de19096d59df1bb072648, ttl=7200
+[14:32:50] INFO | mcp-server | 
+[14:32:50] INFO | mcp-server | [FETCH_ALL_PAGES] Пагинация не обнаружена. Останавливаемся после страницы 1.
+[14:32:50] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:9f481f052290be905f2a2959f1cfa8ab, ttl=9600
+[14:32:50] DEBUG | mcp-server | [CACHE] Cache SET: cache:9f481f052290be905f2a2959f1cfa8ab, ttl=9600
+[14:32:52] INFO | mcp-server | 
+[14:32:52] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:1255df14518c29ac91141cf72f943ce7, ttl=3600
+[14:32:52] DEBUG | mcp-server | [CACHE] Cache SET: cache:1255df14518c29ac91141cf72f943ce7, ttl=3600
+[14:32:52] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:1037f0be5169c9aec58b4586941259da, ttl=9600
+[14:32:52] DEBUG | mcp-server | [CACHE] Cache SET: cache:1037f0be5169c9aec58b4586941259da, ttl=9600
+[14:33:29] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 41, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[14:34:14] WARNING | mcp-server | [TARANTOOL] Invalid thread row: []
+[14:40:58] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:41:01] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:41:12] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[14:41:12] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61292
+[14:41:12] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[14:49:49] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:49:58] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:50:43] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:981e824f1348c22f2546563635d1b97a'
+[14:50:44] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:6165231522 → cache:981e824f1348c22f2546563635d1b97a
+[14:50:44] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 6165231522
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:b35111377fd6f940ce1cb56b9fcbc3f5'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:b35111377fd6f940ce1cb56b9fcbc3f5'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:b35111377fd6f940ce1cb56b9fcbc3f5'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:18ff4cb6c031705995c5866e42ff0fb9'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:18ff4cb6c031705995c5866e42ff0fb9'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:18ff4cb6c031705995c5866e42ff0fb9'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:3c5353609bd74cf49101cf9ff5d2460b'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:3c5353609bd74cf49101cf9ff5d2460b'
+[14:50:44] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:3c5353609bd74cf49101cf9ff5d2460b'
+[14:50:44] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:6165231522 → cache:b35111377fd6f940ce1cb56b9fcbc3f5
+[14:50:44] INFO | mcp-server | 
+[14:50:44] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:6165231522 → cache:18ff4cb6c031705995c5866e42ff0fb9
+[14:50:44] INFO | mcp-server | 
+[14:50:44] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:6165231522 → cache:3c5353609bd74cf49101cf9ff5d2460b
+[14:50:44] INFO | mcp-server | 
+[14:50:44] INFO | mcp-server | 
+[14:50:44] INFO | mcp-server | [FETCH_ALL_PAGES] Пагинация не обнаружена. Останавливаемся после страницы 1.
+[14:50:44] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:b35111377fd6f940ce1cb56b9fcbc3f5, ttl=9600
+[14:50:44] DEBUG | mcp-server | [CACHE] Cache SET: cache:b35111377fd6f940ce1cb56b9fcbc3f5, ttl=9600
+[14:50:47] INFO | mcp-server | 
+[14:50:47] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:3c5353609bd74cf49101cf9ff5d2460b, ttl=3600
+[14:50:47] DEBUG | mcp-server | [CACHE] Cache SET: cache:3c5353609bd74cf49101cf9ff5d2460b, ttl=3600
+[14:50:49] WARNING | mcp-server | [_RETRY_REQUEST] Request error: . Retrying in 0.5 seconds...
+[14:50:49] INFO | mcp-server | 
+[14:50:49] INFO | mcp-server | 
+[14:50:49] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:18ff4cb6c031705995c5866e42ff0fb9, ttl=7200
+[14:50:49] DEBUG | mcp-server | [CACHE] Cache SET: cache:18ff4cb6c031705995c5866e42ff0fb9, ttl=7200
+[14:50:49] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:981e824f1348c22f2546563635d1b97a, ttl=9600
+[14:50:49] DEBUG | mcp-server | [CACHE] Cache SET: cache:981e824f1348c22f2546563635d1b97a, ttl=9600
+[14:50:57] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:123ф
+[14:53:15] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:1234ыа
+[14:53:48] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[14:57:06] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[14:57:12] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_1234ыа
+[14:57:12] INFO | mcp-server | [APP] Thread saved: thread:thread_1234ыа
+[14:57:45] ERROR | mcp-server | [APP] Error scanning threads: 'list' object has no attribute 'startswith'
+[14:59:20] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:04:21] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:04:27] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:981e824f1348c22f2546563635d1b97a'
+[15:04:27] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:981e824f1348c22f2546563635d1b97a': type=<class 'bytes'>, len=30648
+[15:04:27] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:6165231522 → cache:981e824f1348c22f2546563635d1b97a
+[15:04:34] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_1234ыа
+[15:04:34] INFO | mcp-server | [APP] Thread saved: thread:thread_1234ыа
+[15:06:34] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:981e824f1348c22f2546563635d1b97a'
+[15:06:34] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:981e824f1348c22f2546563635d1b97a': type=<class 'bytes'>, len=30648
+[15:06:34] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:6165231522 → cache:981e824f1348c22f2546563635d1b97a
+[15:06:45] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_1234ыа
+[15:06:45] INFO | mcp-server | [APP] Thread saved: thread:thread_1234ыа
+[15:07:02] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:981e824f1348c22f2546563635d1b97a'
+[15:07:02] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:981e824f1348c22f2546563635d1b97a': type=<class 'bytes'>, len=30648
+[15:07:02] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:6165231522 → cache:981e824f1348c22f2546563635d1b97a
+[15:07:19] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_34укпвапва
+[15:07:19] INFO | mcp-server | [APP] Thread saved: thread:thread_34укпвапва
+[15:14:19] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:14:21] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:14:44] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_13кйцуаыв
+[15:14:44] INFO | mcp-server | [APP] Thread saved: thread:thread_13кйцуаыв
+[15:17:04] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_ыапвыап5
+[15:17:04] INFO | mcp-server | [APP] Thread saved: thread:thread_ыапвыап5
+[15:17:54] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_354купеваыим
+[15:17:54] INFO | mcp-server | [APP] Thread saved: thread:thread_354купеваыим
+[15:18:32] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ac3e26e4a9d6e0ba0955c904bc500832'
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:234203103638 → cache:ac3e26e4a9d6e0ba0955c904bc500832
+[15:18:32] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 234203103638
+[15:18:32] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:2a5c97d85afcf2cb7c77cbae30943b4f'
+[15:18:32] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:2a5c97d85afcf2cb7c77cbae30943b4f'
+[15:18:32] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ce8acc1ab1b31ae04536a3561b4e1ced'
+[15:18:32] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ce8acc1ab1b31ae04536a3561b4e1ced'
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:234203103638 → cache:f3ebb2d47305431f1ab477079f7fc7bd
+[15:18:32] INFO | mcp-server | 
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:234203103638 → cache:2a5c97d85afcf2cb7c77cbae30943b4f
+[15:18:32] INFO | mcp-server | 
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:234203103638 → cache:ce8acc1ab1b31ae04536a3561b4e1ced
+[15:18:32] INFO | mcp-server | 
+[15:18:32] INFO | mcp-server | 
+[15:18:32] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:f3ebb2d47305431f1ab477079f7fc7bd, ttl=7200
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache SET: cache:f3ebb2d47305431f1ab477079f7fc7bd, ttl=7200
+[15:18:32] INFO | mcp-server | 
+[15:18:32] INFO | mcp-server | [FETCH_ALL_PAGES] Пагинация не обнаружена. Останавливаемся после страницы 1.
+[15:18:32] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:ce8acc1ab1b31ae04536a3561b4e1ced, ttl=9600
+[15:18:32] DEBUG | mcp-server | [CACHE] Cache SET: cache:ce8acc1ab1b31ae04536a3561b4e1ced, ttl=9600
+[15:18:36] INFO | mcp-server | 
+[15:18:36] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:2a5c97d85afcf2cb7c77cbae30943b4f, ttl=3600
+[15:18:36] DEBUG | mcp-server | [CACHE] Cache SET: cache:2a5c97d85afcf2cb7c77cbae30943b4f, ttl=3600
+[15:18:36] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:ac3e26e4a9d6e0ba0955c904bc500832, ttl=9600
+[15:18:36] DEBUG | mcp-server | [CACHE] Cache SET: cache:ac3e26e4a9d6e0ba0955c904bc500832, ttl=9600
+[15:18:45] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_34цукпвыа
+[15:18:45] INFO | mcp-server | [APP] Thread saved: thread:thread_34цукпвыа
+[15:20:32] ERROR | mcp-server | [APP] Error scanning threads: 'list' object has no attribute 'startswith'
+[15:28:15] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ac3e26e4a9d6e0ba0955c904bc500832'
+[15:28:15] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:ac3e26e4a9d6e0ba0955c904bc500832': type=<class 'bytes'>, len=15259
+[15:28:15] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:234203103638 → cache:ac3e26e4a9d6e0ba0955c904bc500832
+[15:29:13] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 41, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[15:29:45] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_456кер
+[15:29:45] INFO | mcp-server | [APP] Thread saved: thread:thread_456кер
+[15:30:18] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_235цукфыпа
+[15:30:18] INFO | mcp-server | [APP] Thread saved: thread:thread_235цукфыпа
+[15:31:38] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:31:44] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:31:55] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ac3e26e4a9d6e0ba0955c904bc500832'
+[15:31:55] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:ac3e26e4a9d6e0ba0955c904bc500832': type=<class 'bytes'>, len=15259
+[15:31:55] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:234203103638 → cache:ac3e26e4a9d6e0ba0955c904bc500832
+[15:31:59] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_2345екав
+[15:31:59] INFO | mcp-server | [APP] Thread saved: thread:thread_2345екав
+[15:33:27] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:33:30] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:34:06] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_23уцавым24цй
+[15:34:06] INFO | mcp-server | [APP] Thread saved: thread:thread_23уцавым24цй
+[15:34:38] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 429, b'{"status":429,"message":"Too Many Requests"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 12:34:38 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '45', 'connection': 'keep-alive', 'x-request-id': 'd18de0c9-a7c0-4167-a9fa-ffcb9c033c10', 'x-session-id': '91807a4d-f246-4fca-9561-c1bbd36259d1', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'})
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 148, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 413, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 429, b'{"status":429,"message":"Too Many Requests"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 12:34:38 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '45', 'connection': 'keep-alive', 'x-request-id': 'd18de0c9-a7c0-4167-a9fa-ffcb9c033c10', 'x-session-id': '91807a4d-f246-4fca-9561-c1bbd36259d1', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[15:34:40] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_324аыя
+[15:34:40] INFO | mcp-server | [APP] Thread saved: thread:thread_324аыя
+[15:34:51] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 41, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[15:35:24] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_24цукывам
+[15:35:24] INFO | mcp-server | [APP] Thread saved: thread:thread_24цукывам
+[15:42:01] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:42:35] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:42:39] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_12312ыав
+[15:42:39] INFO | mcp-server | [APP] Thread saved: thread:thread_12312ыав
+[15:44:47] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 37, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[15:45:23] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:45:42] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:45:53] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_64непм
+[15:45:53] INFO | mcp-server | [APP] Thread saved: thread:thread_64непм
+[15:56:23] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[15:56:25] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[15:57:03] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 37, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[16:03:14] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:03:18] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:03:27] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_35tergfd
+[16:03:27] INFO | mcp-server | [APP] Thread saved: thread:thread_35tergfd
+[16:04:25] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:04:28] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:05:00] ERROR | mcp-server | [APP] Error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 37, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[16:06:18] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:06:21] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:06:26] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:858175e9122bcf07ff0b55e6358fa773'
+[16:06:26] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:010601751590 → cache:858175e9122bcf07ff0b55e6358fa773
+[16:06:26] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 010601751590
+[16:06:26] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:262f90a8fe8787a22ddc109c432d1ecc'
+[16:06:26] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:010601751590 → cache:a02d7e6156b3711d31cdde4db16d0db5
+[16:06:26] INFO | mcp-server | 
+[16:06:26] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:010601751590 → cache:262f90a8fe8787a22ddc109c432d1ecc
+[16:06:26] INFO | mcp-server | 
+[16:06:26] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:010601751590 → cache:ce9372272233d6c419d341bf4ee7681b
+[16:06:26] INFO | mcp-server | 
+[16:06:26] INFO | mcp-server | 
+[16:06:26] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:a02d7e6156b3711d31cdde4db16d0db5, ttl=7200
+[16:06:26] DEBUG | mcp-server | [CACHE] Cache SET: cache:a02d7e6156b3711d31cdde4db16d0db5, ttl=7200
+[16:06:27] INFO | mcp-server | 
+[16:06:27] INFO | mcp-server | [FETCH_ALL_PAGES] Пагинация не обнаружена. Останавливаемся после страницы 1.
+[16:06:27] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:262f90a8fe8787a22ddc109c432d1ecc, ttl=9600
+[16:06:27] DEBUG | mcp-server | [CACHE] Cache SET: cache:262f90a8fe8787a22ddc109c432d1ecc, ttl=9600
+[16:06:29] INFO | mcp-server | 
+[16:06:29] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:ce9372272233d6c419d341bf4ee7681b, ttl=3600
+[16:06:29] DEBUG | mcp-server | [CACHE] Cache SET: cache:ce9372272233d6c419d341bf4ee7681b, ttl=3600
+[16:06:29] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:858175e9122bcf07ff0b55e6358fa773, ttl=9600
+[16:06:29] DEBUG | mcp-server | [CACHE] Cache SET: cache:858175e9122bcf07ff0b55e6358fa773, ttl=9600
+[16:06:33] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_ASDFASDG
+[16:06:33] INFO | mcp-server | [APP] Thread saved: thread:thread_ASDFASDG
+[16:14:09] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:30:27] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:30:59] WARNING | mcp-server | [APP] Failed to convert message: 'dict' object has no attribute 'type'
+[16:30:59] WARNING | mcp-server | [APP] Failed to convert message: 'dict' object has no attribute 'type'
+[16:30:59] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_фывпафыва
+[16:30:59] INFO | mcp-server | [APP] Thread saved: thread:thread_фывпафыва
+[16:32:02] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:32:31] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:33:32] WARNING | mcp-server | [APP] Failed to serialize message: name 'BaseMessage' is not defined
+[16:33:32] WARNING | mcp-server | [APP] Failed to serialize message: name 'BaseMessage' is not defined
+[16:33:32] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_3кпуца
+[16:33:32] INFO | mcp-server | [APP] Thread saved: thread:thread_3кпуца
+[16:38:19] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:38:23] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:38:38] ERROR | mcp-server | [APP] Критическая ошибка в узле 'tool_node_with_counter': tool_node_with_counter() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 186, in wrapped
+    return await node_func(state, config)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: tool_node_with_counter() takes 1 positional argument but 2 were given
+[16:38:38] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 13:38:38 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'a
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 125, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 413, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 13:38:38 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '60cc0130-e694-4faa-9f7a-32cce438bdc3', 'x-session-id': '5467580f-f1e0-41be-813f-f66e0cec2c60', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[16:38:40] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_24еукпЯсчм
+[16:38:40] INFO | mcp-server | [APP] Thread saved: thread:thread_24еукпЯсчм
+[16:40:54] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:43:09] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:43:18] ERROR | mcp-server | [APP] Критическая ошибка в узле 'tools_with_counter_node': tools_with_counter_node() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 186, in wrapped
+    return await node_func(state, config)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: tools_with_counter_node() takes 1 positional argument but 2 were given
+[16:43:18] ERROR | mcp-server | [APP] Ошибка LLM: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 13:43:18 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'a
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 125, in agent_node
+    response = await agent_runnable.ainvoke(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 3124, in ainvoke
+    input_ = await coro_with_context(part(), context, create_task=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/runnables/base.py", line 5508, in ainvoke
+    return await self.bound.ainvoke(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 415, in ainvoke
+    llm_result = await self.agenerate_prompt(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1030, in agenerate_prompt
+    return await self.agenerate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 988, in agenerate
+    raise exceptions[0]
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_core/language_models/chat_models.py", line 1158, in _agenerate_with_cache
+    result = await self._agenerate(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langchain_gigachat/chat_models/gigachat.py", line 601, in _agenerate
+    response = await self._client.achat(payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 469, in achat
+    return await self._adecorator(_acall)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 413, in _adecorator
+    return await acall()
+           ^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/client.py", line 467, in _acall
+    return await post_chat.asyncio(self._aclient, chat=chat, access_token=self.token)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/post_chat.py", line 50, in asyncio
+    return build_response(response, ChatCompletion)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/gigachat/api/utils.py", line 88, in build_response
+    raise ResponseError(response.url, response.status_code, response.content, response.headers)
+gigachat.exceptions.ResponseError: (URL('https://gigachat.devices.sberbank.ru/api/v1/chat/completions'), 422, b'{"status":422,"message":"Invalid params: every assistant function call must have a result in history"}\n', Headers({'server': 'SynGX', 'date': 'Fri, 05 Sep 2025 13:43:18 GMT', 'content-type': 'application/json; charset=utf-8', 'content-length': '103', 'connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization', 'access-control-allow-methods': 'GET, POST, DELETE, OPTIONS', 'access-control-allow-origin': 'https://beta.saluteai.sberdevices.ru', 'x-request-id': '669c0e6a-028f-4e54-9694-be6a76792826', 'x-session-id': 'ed86108f-de53-4d93-a7f6-36b0ba62bc37', 'allow': 'GET, POST', 'strict-transport-security': 'max-age=31536000; includeSubDomains'}))
+[16:43:20] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_2345235ыиапыве
+[16:43:20] INFO | mcp-server | [APP] Thread saved: thread:thread_2345235ыиапыве
+[16:43:30] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:43:52] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:43:54] ERROR | mcp-server | [APP] Critical error in process_prompt: 'ToolNode' object has no attribute '__name__'
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 174, in wrapped
+    return await node_func(state, config)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'ToolNode' object is not callable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 39, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2939, in astream
+    async for _ in runner.atick(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 295, in atick
+    await arun_with_retry(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 137, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 706, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 474, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/app/agent/server.py", line 176, in wrapped
+    error_msg = f"Критическая ошибка в узле '{node_func.__name__}': {str(e)[:500]}"
+                                              ^^^^^^^^^^^^^^^^^^
+AttributeError: 'ToolNode' object has no attribute '__name__'. Did you mean: '__ne__'?
+During task with name 'tools' and id 'eea1d8c3-62be-986c-dac9-7c64d7ac2016'
+[16:44:10] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:44:28] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:44:36] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_24ку314ыфпф
+[16:44:36] INFO | mcp-server | [APP] Thread saved: thread:thread_24ку314ыфпф
+[16:45:02] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_235нцвацвар
+[16:45:02] INFO | mcp-server | [APP] Thread saved: thread:thread_235нцвацвар
+[16:45:12] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:45:55] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:46:02] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_2312343ням
+[16:46:02] INFO | mcp-server | [APP] Thread saved: thread:thread_2312343ням
+[16:51:56] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[16:52:40] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[16:52:51] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_2rwesf
+[16:52:51] INFO | mcp-server | [APP] Thread saved: thread:thread_2rwesf
+[16:53:33] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_3екупавып
+[16:53:33] INFO | mcp-server | [APP] Thread saved: thread:thread_3екупавып
+[16:53:47] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_3екуфыывапавып
+[16:53:47] INFO | mcp-server | [APP] Thread saved: thread:thread_3екуфыывапавып
+[16:54:45] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ac3e26e4a9d6e0ba0955c904bc500832'
+[16:54:45] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:ac3e26e4a9d6e0ba0955c904bc500832': type=<class 'bytes'>, len=15259
+[16:54:45] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:234203103638 → cache:ac3e26e4a9d6e0ba0955c904bc500832
+[16:54:48] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_24ецуу
+[16:54:48] INFO | mcp-server | [APP] Thread saved: thread:thread_24ецуу
+[16:55:15] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_61325ёеаа
+[16:55:15] INFO | mcp-server | [APP] Thread saved: thread:thread_61325ёеаа
+[16:57:14] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:ac3e26e4a9d6e0ba0955c904bc500832'
+[16:57:14] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:ac3e26e4a9d6e0ba0955c904bc500832': type=<class 'bytes'>, len=15259
+[16:57:14] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:234203103638 → cache:ac3e26e4a9d6e0ba0955c904bc500832
+[16:57:20] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_24епфууапывап
+[16:57:20] INFO | mcp-server | [APP] Thread saved: thread:thread_24епфууапывап
+[16:57:54] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_26й5е43пкцвы
+[16:57:54] INFO | mcp-server | [APP] Thread saved: thread:thread_26й5е43пкцвы
+[17:01:03] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[17:01:06] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[17:01:13] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[17:01:13] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61292
+[17:01:13] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[17:01:50] ERROR | mcp-server | [APP] Critical error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 39, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[17:02:22] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[17:02:25] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[17:03:00] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[17:03:00] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61292
+[17:03:00] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[17:03:13] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_12123341223ы
+[17:03:13] INFO | mcp-server | [APP] Thread saved: thread:thread_12123341223ы
+[17:03:27] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[17:05:05] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[17:05:25] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[17:05:25] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61292
+[17:05:25] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[17:06:14] ERROR | mcp-server | [APP] Critical error in process_prompt: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+Traceback (most recent call last):
+  File "/home/user/dev/mcp-server/app/routes/agent_routes.py", line 38, in process_prompt
+    final_state = await app_graph.ainvoke(initial_state, config=config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3112, in ainvoke
+    async for chunk in self.astream(
+  File "/home/user/dev/mcp-server/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 2977, in astream
+    raise GraphRecursionError(msg)
+langgraph.errors.GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+[17:06:23] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_12цуывычмсиыф
+[17:06:23] INFO | mcp-server | [APP] Thread saved: thread:thread_12цуывычмсиыф
+[17:06:48] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[17:07:25] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[17:07:39] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:1037f0be5169c9aec58b4586941259da'
+[17:07:39] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:1037f0be5169c9aec58b4586941259da': type=<class 'bytes'>, len=61292
+[17:07:39] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:5009106586 → cache:1037f0be5169c9aec58b4586941259da
+[17:07:44] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_099887634кпапи
+[17:07:44] INFO | mcp-server | [APP] Thread saved: thread:thread_099887634кпапи
+[17:07:53] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
