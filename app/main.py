@@ -6,7 +6,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from app.agent.server import run_mcp_server
+# from app.agent.server import run_mcp_server
+from app.mcp_server.server import run_mcp_server
 from app.routes.agent_routes import agent_router
 from app.routes.data_routes import data_router
 from app.routes.utility_routes import utility_router

@@ -1,14 +1,30 @@
+import asyncio
+from fastmcp import FastMCP, Context
 import os
 import re
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
+
 
 import aiofiles
 
 from app.services.fetch_data import fetch_company_info
 
+mcp = FastMCP(
+    name="СlientAnalisysServer",
+    mask_error_details=True,
+    on_duplicate_tools="error"
+)
 
-async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
+
+@mcp.tool(
+    name="Подсчитывает количество файлов и папок",
+    description="Подсчитывает количество файлов и папок в указанной директории"
+)
+async def count_files_in_directory(
+    directory_path: Annotated[str, "Путь к директории"],
+    ctx: Context
+) -> Dict[str, Any]:
     """Подсчитывает количество файлов и папок в указанной директории.
 
     Используй, когда пользователь спрашивает о содержимом папки: сколько файлов, папок, их размер.
@@ -26,6 +42,8 @@ async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
         - directories: список имён папок
         При ошибке — объект с полем 'error'.
     """
+    await ctx.info(f"Обрабатываю запрос подсчета файлов в директории {directory_path}")
+
     try:
         if not os.path.exists(directory_path):
             return {
@@ -84,7 +102,11 @@ async def count_files_in_directory(directory_path: str) -> Dict[str, Any]:
         }
 
 
-async def get_current_time() -> str:
+@mcp.tool(
+    name="Возвращает текущую дату и время",
+    description="Возвращает текущую дату и время в формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС"
+)
+async def get_current_time(ctx: Context) -> str:
     """Возвращает текущую дату и время в формате 'ГГГГ-ММ-ДД ЧЧ:ММ:СС'.
 
     Используй, когда пользователь спрашивает 'который час', 'сегодняшнюю дату' или 'текущее время'.
@@ -95,6 +117,8 @@ async def get_current_time() -> str:
     Возвращает:
        Структурированный словарь с датой и временем.
     """
+    await ctx.info("Обрабатываю запрос текущего времени")
+    
     now = datetime.now()
     return {
         "status": "success",
@@ -103,8 +127,14 @@ async def get_current_time() -> str:
         "summary": f"Текущее время: {now.strftime('%H:%M')}",
     }
 
-
-async def read_file_content(file_path: str) -> Dict[str, Any]:
+@mcp.tool(
+    name="Читает содержимое текстового файла",
+    description="Читает содержимое текстового файла и возвращает его как строку"
+)
+async def read_file_content(
+    file_path: Annotated[str, "Путь к файлу"],
+    ctx: Context
+) -> Dict[str, Any]:
     """Читает содержимое текстового файла и возвращает его как строку.
 
     Используй, когда нужно получить текст из файла для анализа, цитирования или проверки.
@@ -120,6 +150,8 @@ async def read_file_content(file_path: str) -> Dict[str, Any]:
         - line_count: количество строк
         При ошибке — объект с полем 'error'.
     """
+    await ctx.info(f"Обрабатываю запрос чтения файла: {file_path}")
+
     try:
         if not os.path.exists(file_path):
             return {
@@ -136,6 +168,7 @@ async def read_file_content(file_path: str) -> Dict[str, Any]:
 
         async with aiofiles.open(file_path, "r", encoding="utf-8") as f:
             content = await f.read()
+            summary = await ctx.sample(f"Кратко резюмируй: {content[:500]}")
 
         return {
             "status": "success",
@@ -144,7 +177,7 @@ async def read_file_content(file_path: str) -> Dict[str, Any]:
             "size_bytes": len(content.encode("utf-8")),
             "line_count": content.count("\n") + 1,
             "encoding": "utf-8",
-            "summary": f"Successfully read {len(content)} characters",
+            "summary": summary,
         }
     except UnicodeDecodeError:
         return {
@@ -166,8 +199,14 @@ async def read_file_content(file_path: str) -> Dict[str, Any]:
         }
 
 
+@mcp.tool(
+    name="Создаёт текстовый файл",
+    description="Создаёт текстовый файл (.txt) с указанным содержимым"
+)
 async def create_note(
-    note_content: str, note_name: Optional[str] = None
+    ctx: Context,
+    note_content: Annotated[str, "Тело файла"],
+    note_name: Optional[Annotated[str, "Наименование файла"]] = None
 ) -> Dict[str, Any]:
     """Создаёт текстовый файл (.txt) с указанным содержимым.
 
@@ -191,6 +230,8 @@ async def create_note(
         - size_bytes: размер в байтах
         При ошибке — объект с полем 'error'.
     """
+    await ctx.info("Обрабатываю запрос создания файла")
+
     try:
         # Если имя содержит шаблоны, код или недопустимые символы — игнорируем
         if note_name and (
@@ -262,8 +303,15 @@ async def create_note(
         }
 
 
-async def fetch_company_info_for_analyze(inn: str) -> Dict[str, Any]:
-    """Получает полную информацию о компании по ИНН из DaData и InfoSphere.
+@mcp.tool(
+    name="Получает полную информацию о компании",
+    description="Получает полную информацию о компании по ИНН из DaData, InfoSphere и Casebook"
+)
+async def fetch_company_info_for_analyze(
+    inn: Annotated[str, "ИНН клиента"],
+    ctx: Context
+) -> Dict[str, Any]:
+    """Получает полную информацию о компании по ИНН из DaData, InfoSphere и Casebook.
 
     Используй, когда требуется анализ клиента, проверка юрлица, оценка рисков.
     Возвращает данные о статусе, руководителе, судебных делах, исполнительных производствах, поддержке.
@@ -281,6 +329,8 @@ async def fetch_company_info_for_analyze(inn: str) -> Dict[str, Any]:
         - inn: переданный ИНН
         При ошибке — объект с полем 'error'.
     """
+    await ctx.info("Обрабатываю запрос информации по клиенту: {inn}")
+
     if not re.fullmatch(r"\d{10}|\d{12}", inn):
         return {
             "error": {
@@ -296,11 +346,13 @@ async def fetch_company_info_for_analyze(inn: str) -> Dict[str, Any]:
                 "error": {"type": "company_fetch_failed", "message": result["error"]}
             }
 
+        summary = ctx.sample("Кратко резюмируй")
+
         return {
             "status": "success",
             "company_info": result,
             "inn": inn,
-            "summary": f"Successfully fetched data for INN {inn}",
+            "summary": summary,
         }
     except Exception as e:
         return {
@@ -309,3 +361,7 @@ async def fetch_company_info_for_analyze(inn: str) -> Dict[str, Any]:
                 "message": f"Failed to fetch company info: {str(e)}",
             }
         }
+
+
+async def run_mcp_server():
+    await mcp.run_async()

@@ -1339,3 +1339,48 @@ For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/er
 [17:07:44] DEBUG | mcp-server | [TARANTOOL] Persistent saved: thread:thread_099887634кпапи
 [17:07:44] INFO | mcp-server | [APP] Thread saved: thread:thread_099887634кпапи
 [17:07:53] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[22:06:53] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[22:07:50] ERROR | mcp-server | [TARANTOOL] Failed to save persistent thread:thread_string: There's no space with name 'persistent'
+[22:07:50] INFO | mcp-server | [APP] Thread saved: thread:thread_string
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:08aceb857e73acdaaeed484130570643'
+[22:08:05] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_company_info:2312016641 → cache:08aceb857e73acdaaeed484130570643
+[22:08:05] INFO | mcp-server | [COMPANY_INFO] Fetching data for INN: 2312016641
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:6d10c38a3d0ddfe170820e256d2775fc'
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:6d10c38a3d0ddfe170820e256d2775fc'
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:9570f40cf8c214294668c7ceb1b37d69'
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:9570f40cf8c214294668c7ceb1b37d69'
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:9570f40cf8c214294668c7ceb1b37d69'
+[22:08:05] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:d634b73985cc20f08e9cea06382b6a7a'
+[22:08:05] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_casebook:2312016641 → cache:6d10c38a3d0ddfe170820e256d2775fc
+[22:08:05] WARNING | mcp-server | [CACHE] Function fetch_from_casebook raised exception, not caching
+[22:08:05] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_infosphere:2312016641 → cache:9570f40cf8c214294668c7ceb1b37d69
+[22:08:05] INFO | mcp-server | 
+[22:08:05] DEBUG | mcp-server | [CACHE] Cache MISS: app.services.fetch_data:fetch_from_dadata:2312016641 → cache:d634b73985cc20f08e9cea06382b6a7a
+[22:08:05] WARNING | mcp-server | [CACHE] Function fetch_from_dadata raised exception, not caching
+[22:08:07] INFO | mcp-server | 
+[22:08:07] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:9570f40cf8c214294668c7ceb1b37d69, ttl=3600
+[22:08:07] DEBUG | mcp-server | [CACHE] Cache SET: cache:9570f40cf8c214294668c7ceb1b37d69, ttl=3600
+[22:08:07] ERROR | mcp-server | [COMPANY_INFO] Error fetching from dadata: 'Settings' object has no attribute 'dadata_api_key'
+[22:08:07] ERROR | mcp-server | [COMPANY_INFO] Error fetching from casebook: 'Settings' object has no attribute 'casebook_api_key'
+[22:08:07] DEBUG | mcp-server | [TARANTOOL] Cache set: cache:08aceb857e73acdaaeed484130570643, ttl=9600
+[22:08:07] DEBUG | mcp-server | [CACHE] Cache SET: cache:08aceb857e73acdaaeed484130570643, ttl=9600
+[22:08:09] ERROR | mcp-server | [TARANTOOL] Failed to save persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:08:09] INFO | mcp-server | [APP] Thread saved: thread:thread_str24ing
+[22:08:24] ERROR | mcp-server | [APP] Failed to get persistent thread:str24ing: There's no space with name 'persistent'
+[22:08:24] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:08:24] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:09:41] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[22:09:46] INFO | mcp-server | [TARANTOOL] Tarantool connected successfully
+[22:09:50] ERROR | mcp-server | [APP] Failed to get persistent thread:str24ing: There's no space with name 'persistent'
+[22:09:50] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:09:50] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:09:58] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() called for key='cache:08aceb857e73acdaaeed484130570643'
+[22:09:58] DEBUG | mcp-server | [TARANTOOL_DEBUG] Tarantool.get() unpacking value for key='cache:08aceb857e73acdaaeed484130570643': type=<class 'bytes'>, len=2824
+[22:09:58] DEBUG | mcp-server | [CACHE] Cache HIT: app.services.fetch_data:fetch_company_info:2312016641 → cache:08aceb857e73acdaaeed484130570643
+[22:10:01] ERROR | mcp-server | [TARANTOOL] Failed to save persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:10:01] INFO | mcp-server | [APP] Thread saved: thread:thread_str24ing
+[22:10:10] ERROR | mcp-server | [APP] Failed to get persistent thread:str24ing: There's no space with name 'persistent'
+[22:10:10] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:10:10] ERROR | mcp-server | [APP] Failed to get persistent thread:thread_str24ing: There's no space with name 'persistent'
+[22:10:21] INFO | mcp-server | [TARANTOOL] Tarantool connection closed
+[22:11:33] ERROR | mcp-server | [TARANTOOL] Tarantool connection failed: (111, 'Connection refused')
